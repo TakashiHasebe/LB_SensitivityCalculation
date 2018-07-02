@@ -12,7 +12,7 @@ t=3.*365.*24.*60.*60.*0.72;# 3 years ovservation time including cosmic ray loss 
 Freq = np.array([40., 50., 60., 68., 78., 89., 100., 119., 140., 166., 195., 235., 280, 337., 402.]);
 m=4
 n=3
-num=100000
+num=10000
 ############################# Optics Temperatures ################################
 T_cmb, T_hwp, T_apt, T_mir, T_fil, T_len, T_lens, T_baf = op.Temp_Opt()
 Tr_hwp,Tr_mir,Tr_fil,Tr_len,Tr_lens = op.Temp_Ref_Opt()
