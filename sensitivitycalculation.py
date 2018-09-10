@@ -4,10 +4,19 @@ import fp as fp
 import opt as op
 import matplotlib.pyplot as plt
 
+pi = f.pi
+k_b = f.k_b
+c= f.c
+h= f.h
+
 ########################## Telescope Configrations #############################
 confLFT = 0
 confHFT = 0
-################################################################################
+
+########################### Bath Temperature ##########################
+T_bath = 0.1
+
+#######################################################################
 t=3.*365.*24.*60.*60.*0.72;# 3 years ovservation time including cosmic ray loss (0.85) and ADR duty cycle (0.85)
 Freq = np.array([40., 50., 60., 68., 78., 89., 100., 119., 140., 166., 195., 235., 280, 337., 402.]);
 m=4
@@ -17,6 +26,10 @@ num=10000
 T_cmb, T_hwp, T_apt, T_mir, T_fil, T_len, T_lens, T_baf = op.Temp_Opt()
 Tr_hwp,Tr_mir,Tr_fil,Tr_len,Tr_lens = op.Temp_Ref_Opt()
 
+T_len = T_bath
+T_horn = T_bath
+Tr_len = T_baf
+Tr_horn = T_baf
 ################################ FP parameters ##########################################
 freqLFT, bandLFT, dpixLFT, npixLFT, NEPreadLFT = fp.LFT_FP(confLFT)
 freqHFT, bandHFT, dpixHFT, npixHFT, NEPreadHFT = fp.HFT_FP(confHFT)
@@ -31,6 +44,7 @@ det_eff_LFT = op.LFT_Det(confLFT)
 hwp_emiss_HFT, ref_hwp_HFT = op.HFT_Hwp(confHFT)
 bf_HFT, Fnum_HFT = op.HFT_Apt(confHFT) 
 det_eff_HFT = op.HFT_Det(confHFT) 
+ref_horn = 0.05
 
 #Sapphire HWP for HFT
 t_hwp, n_hwp, tan_hwp, ref_hwp_sap = op.Sap_HWP()
@@ -53,6 +67,8 @@ dpdt_arr = np.zeros(num)
 NETarrLFT=([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
 NETarrLFTmargin=([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
 
+print "Freq [GHz] , Popt [pW] , NEPph [aW/rtHz] , NEPg [aW/rtHz] , NEPread [aW/rtHz] , NEPdet [aW/rtHz] , NETdet [microK/rtHz] , NETarr [microK/rtHz] , NETarrmargin [microK/rtHz]"
+
 for i in range(0,m):
     for j in range(0,n):
         freq_l, freq_h = f.FreqRange(freqLFT[i][j],bandLFT[i][j])
@@ -70,7 +86,7 @@ for i in range(0,m):
             fil_emiss_ref = fil_emiss + ref_fil*f.BB(freq*1.e9, Tr_fil)/f.BB(freq*1.e9, T_fil)
             len_emiss, len_eff = f.Trm(t_len, n_len, tan_len, freq*1.e9, ref_len)
             len_emiss_ref = len_emiss + ref_len*f.BB(freq*1.e9, Tr_len)/f.BB(freq*1.e9, T_len)
-
+           
             ###### reflection effect ##### 
             hwp_emiss = hwp_emiss_ref
             len_emiss = len_emiss_ref
@@ -94,14 +110,15 @@ for i in range(0,m):
                 
         Popt = np.sum(p_opt_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
         NEPopt =np.sqrt(np.sum(nep_opt_arr)*(freq_h-freq_l)*1.e9/num)*1.e18 # in unit of aW
-        NEPth = 7.31e-12*np.sqrt(Popt*1.e-12)*1.e18;
-        NEPint = np.sqrt(NEPopt**2. + NEPth**2. + NEPreadLFT[i][j]**2.)
+        NEPth = np.sqrt(4.*k_b*2.5*Popt*1.e-12*T_bath*(3.+1.)**2./(2.*3.+3.)*(1.71**(2.*3.+3.)-1.)/((1.71**(3.+1.)-1.)**2.))*1.e18
+        NEPread = np.sqrt(0.21*(NEPopt**2.+NEPth**2.))
+        NEPint = np.sqrt(NEPopt**2. + NEPth**2. + NEPread**2.)
         DPDT = np.sum(dpdt_arr)*(freq_h-freq_l)*1.e9/num
         NETdet = NEPint*1.e-18/np.sqrt(2.)/DPDT*1.e6 # in unit of microK
         NETarrLFT[i][j] = NETdet/np.sqrt(2.*npixLFT[i][j])  
         NETarrLFTmargin[i][j] = NETdet*1.15/np.sqrt(2.*npixLFT[i][j]*0.8)  
 
-       # print("freq=",freqLFT[i][j],"Popt=",Popt,"NEPopt=",NEPopt,"NEPth=",NEPth,"NEPreadLFT=",NEPreadLFT[i][j],"NEPint=",NEPint,"NETdet=",NETdet,"NETarr=",NETarrLFT[i][j],"NETarrmargin=",NETarrLFTmargin[i][j])
+        print round(freqLFT[i][j],2)," , ",round(Popt,2)," , ",round(NEPopt,2)," , ",round(NEPth,2)," , ",round(NEPread,2)," , ",round(NEPint,2)," , ",round(NETdet,2)," , ",round(NETarrLFT[i][j],2)," , ",round(NETarrLFTmargin[i][j],2)
 
 ##########################################################################
 
@@ -138,8 +155,9 @@ for i in range(0,n):
 
             else: # horn coupled detector
                 len_emiss = 0.
-                len_eff = 1.
-                len_emiss_ref = 0.
+                len_eff = 1.-ref_horn
+                len_emiss_ref = len_emiss + ref_horn*f.BB(freq*1.e9, Tr_horn)/f.BB(freq*1.e9,T_len)
+
 
             ###### reflection effect ##### 
             hwp_emiss = hwp_emiss_ref
@@ -164,14 +182,16 @@ for i in range(0,n):
                 
         Popt = np.sum(p_opt_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
         NEPopt =np.sqrt(np.sum(nep_opt_arr)*(freq_h-freq_l)*1.e9/num)*1.e18 # in unit of aW
-        NEPth = 7.31e-12*np.sqrt(Popt*1.e-12)*1.e18;
-        NEPint = np.sqrt(NEPopt**2. + NEPth**2. + NEPreadHFT[i][j]**2.)
+        NEPth = np.sqrt(4.*k_b*2.5*Popt*1.e-12*T_bath*(3.+1.)**2./(2.*3.+3.)*(1.71**(2.*3.+3.)-1.)/((1.71**(3.+1.)-1.)**2.))*1.e18
+        NEPread = np.sqrt(0.21*(NEPopt**2.+NEPth**2.))
+        NEPint = np.sqrt(NEPopt**2. + NEPth**2. + NEPread**2.)
         DPDT = np.sum(dpdt_arr)*(freq_h-freq_l)*1.e9/num
         NETdet = NEPint*1.e-18/np.sqrt(2.)/DPDT*1.e6 # in unit of microK
         NETarrHFT[i][j] = NETdet/np.sqrt(2.*npixHFT[i][j])  
         NETarrHFTmargin[i][j] = NETdet*1.15/np.sqrt(2.*npixHFT[i][j]*0.8)  
 
-       # print("freq=",freqHFT[i][j],"Popt=",Popt,"NEPopt=",NEPopt,"NEPth=",NEPth,"NEPreadHFT=",NEPreadHFT[i][j],"NEPint=",NEPint,"NETdet=",NETdet,"NETarr=",NETarrHFT[i][j],"NETarrmargin=",NETarrHFTmargin[i][j])
+
+        print round(freqHFT[i][j],2)," , ",round(Popt,2)," , ",round(NEPopt,2)," , ",round(NEPth,2)," , ",round(NEPread,2)," , ",round(NEPint,2)," , ",round(NETdet,2)," , ",round(NETarrHFT[i][j],2)," , ",round(NETarrHFTmargin[i][j],2)
 
 NETarr = np.zeros(15)        
 NETarr[0]= NETarrLFTmargin[0][0];
@@ -193,9 +213,10 @@ NETarr[13]= NETarrHFTmargin[2][1];
 NETarr[14]= NETarrHFTmargin[2][2];
 
 Sensitivity =  f.Sigma( NETarr, t);
-  
+
+print "Freq [GHz] , NETarr [microK/rtHz] , Sensitivity [microK -arcmin]"
 for i in range (0,15):
-    print("freq=",Freq[i],"NETarr=",NETarr[i],"Sensitivity=",Sensitivity[i])
+    print Freq[i]," , ",round(NETarr[i],2)," , ",round(Sensitivity[i],2)
 
 ############################# Plot ####################################
 fig = plt.figure(figsize=(10, 6))

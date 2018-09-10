@@ -57,7 +57,7 @@ def HFT_Apt(confHFT):
     return bf_HFT, Fnum_HFT 
 
 def HFT_Det(confHFT):# detector coupling efficiency
-    det_eff_HFT = np.array([[0.68,0.68,0.68],[0.68,0.68,0.68],[0.66,0.66,0.66]])
+    det_eff_HFT = np.array([[0.68,0.68,0.68],[0.68,0.68,0.68],[0.75,0.85,0.75]])
     return det_eff_HFT 
 
 ##### common optics #####
