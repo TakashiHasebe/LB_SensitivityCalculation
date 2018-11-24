@@ -11,7 +11,7 @@ h= f.h
 
 ########################## Telescope Configrations #############################
 confLFT = 0
-confHFT = 0
+confHFT = 2
 
 ########################### Bath Temperature ##########################
 T_bath = 0.1

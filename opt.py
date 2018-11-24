@@ -3,7 +3,7 @@ import numpy as np
 ############################# Optics Temperatures ############################################
 def Temp_Opt():
     T_cmb = 2.725
-    T_hwp = 5.
+    T_hwp = 10.
     T_apt = 2.
     T_mir = 5.
     T_fil = 2.
@@ -45,6 +45,11 @@ def HFT_Hwp(confHFT):
     if confHFT == 1:#transmissive mesh HWP for split HFT
         hwp_emiss_HFT = np.array([[3.3e-3, 3.3e-3, 3.3e-3],[3.3e-3, 3.3e-3, 3.3e-3],[3.e-3, 3.e-3, 3.e-3]])  
         ref_hwp_HFT = np.array([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
+    if confHFT == 2:#transmissive mesh HWP for split HFT
+        hwp_emiss_HFT = np.array([[3.3e-3, 3.3e-3, 3.3e-3],[3.3e-3, 3.3e-3, 3.3e-3],[3.e-3, 3.e-3, 3.e-3]])  
+        ref_hwp_HFT = np.array([[0.03,0.03,0.03],[0.03,0.03,0.03],[0.03,0.03,0.03]])
+       # ref_hwp_HFT = np.array([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
+     
     return hwp_emiss_HFT, ref_hwp_HFT 
 
 def HFT_Apt(confHFT):
@@ -54,6 +59,9 @@ def HFT_Apt(confHFT):
     if confHFT == 1:#split HFT aperture
         bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[3.1,3.1,3.1]])
         Fnum_HFT = 2.2
+    if confHFT == 2:#split HFT aperture
+        bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[3.1,3.1,3.1]])
+        Fnum_HFT = 3.0
     return bf_HFT, Fnum_HFT 
 
 def HFT_Det(confHFT):# detector coupling efficiency
