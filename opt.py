@@ -1,3 +1,4 @@
+
 import numpy as np
 
 ############################# Optics Temperatures ############################################
@@ -31,7 +32,9 @@ def LFT_Hwp(confLFT):#LFT HWP with ARC
     ref_hwp_LFT = np.array([[0.175, 0.068, 0.042],[0.103, 0.051, 0.037],[0.051, 0.037, 0.013],[0.042, 0.028, 0.001]])
    # ref_hwp_LFT = np.array([[0., 0., 0.],[0.103, 0.051, 0.037],[0.051, 0.037, 0.013],[0.042, 0.028, 0.001]])
    
-    hwp_holder_LFT = np.array([[0.013, 0.013, 0.013],[0.013, 0.013, 0.013],[0.013, 0.013, 0.013],[0.013, 0.013, 0.013]])
+
+   # hwp_holder_LFT = np.array([[0.013, 0.013, 0.013],[0.013, 0.013, 0.013],[0.013, 0.013, 0.013],[0.013, 0.013, 0.013]])
+    hwp_holder_LFT = np.array([[1.3e-2, 0.49e-2, 0.15e-2],[0.84e-2, 0.3e-2, 0.06e-2],[1.03e-2, 0.51e-2, 0.13e-2],[0.75e-2, 0.33e-2, 0.04e-2]])
     return hwp_emiss_LFT, ref_hwp_LFT, hwp_holder_LFT
 
 def LFT_Apt(confLFT):# LFT aperture 
@@ -53,7 +56,6 @@ def HFT_Hwp(confHFT):
         ref_hwp_HFT = np.array([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
     if confHFT == 2:#transmissive mesh HWP for split HFT
         hwp_emiss_HFT = np.array([[4.4e-2, 2.1e-2, 2.4e-2],[2.7e-2, 1.7e-2, 2.8e-2],[2.1e-2, 1.7e-2, 2.7e-2]])  
-       # ref_hwp_HFT = np.array([[0.03,0.03,0.03],[0.03,0.03,0.03],[0.03,0.03,0.03]])
         ref_hwp_HFT = np.array([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
      
     return hwp_emiss_HFT, ref_hwp_HFT 
@@ -66,9 +68,10 @@ def HFT_Apt(confHFT):
         bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[3.1,3.1,3.1]])
         Fnum_HFT = 2.2
     if confHFT == 2:#split HFT aperture
-       # bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[3.1,3.1,3.1]])
-        bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[2.75,2.75,3.1]])
+        bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[3.1,3.1,3.1]])
+       # bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[2.75,2.75,3.1]])
         Fnum_HFT = 3.0
+       # Fnum_HFT = 2.2
     return bf_HFT, Fnum_HFT 
 
 def HFT_Det(confHFT):# detector coupling efficiency
@@ -79,10 +82,10 @@ def HFT_Det(confHFT):# detector coupling efficiency
 
 ##### common optics #####
 def Sap_HWP():#Sapphire HWP for HFT
-    t_hwp = 27.e-3 #thickness
+    t_hwp = 15.e-3 #thickness
     n_hwp = 3.24 #refractive index
     tan_hwp = 5.e-5 #loss tangent
-    ref_hwp_sap = 0.02 #reflection
+    ref_hwp_sap = 0.03 #reflection
     return t_hwp, n_hwp, tan_hwp, ref_hwp_sap
 
 def Mir():#Mirror 
@@ -92,11 +95,15 @@ def Mir():#Mirror
     return epsilon, rho, rms
 
 def Si_Lens():#Field and Objective Lenses
-    t_lens = 20.e-3
+    t_lens1 = 20.e-3
+    t_lens2 = 20.e-3
+    t_lens3 = 20.e-3
+    t_lens4 = 20.e-3
+   # t_lens = 20.e-3
     n_lens = 3.4
     tan_lens = 5.e-5
-    ref_lens = 0.02
-    return t_lens, n_lens, tan_lens, ref_lens
+    ref_lens = 0.03
+    return t_lens1, t_lens2,t_lens3,t_lens4, n_lens, tan_lens, ref_lens
 
 def HDPE_Lens():#Field and Objective Lenses
     t_lens1 = 30.e-3
