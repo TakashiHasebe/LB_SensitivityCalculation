@@ -1,7 +1,7 @@
 import numpy as np
 import function as f
-import fp as fp
-import opt as op
+import fp_newband as fp
+import opt_newband as op
 import matplotlib.pyplot as plt
 
 pi = f.pi
@@ -21,8 +21,11 @@ DC = 1.0
 #######################################################################
 t=3.*365.*24.*60.*60.*0.95*0.95*DC;# 3 years ovservation time including cosmic ray loss (0.95), margin (0.95) and sub-K cooler duty cycle
 Freq = np.array([40., 50., 60., 68., 78., 89., 100., 119., 140., 166., 195., 235., 280, 337., 402.]);
-m=4
-n=3
+m1=4
+n1=3
+m2=2
+n2=5
+
 num=10000
 ############################# Optics Temperatures ################################
 T_bath,T_cmb, T_hwp_LFT,T_hwp_HFT, T_apt, T_mir, T_fil, T_len, T_lens, T_baf, Tr_hwp,Tr_mir,Tr_fil,Tr_len,Tr_lens = op.Temp_Opt()
@@ -80,8 +83,8 @@ NETarrLFTmargin=([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
 print "Freq [GHz] , Popt [pW] , Psat [pW] ,NEPph [aW/rtHz] , NEPg [aW/rtHz] , NEPread [aW/rtHz] , NEPdet [aW/rtHz] , NETdet [microK/rtHz] , NETarr [microK/rtHz] , NETarrmargin [microK/rtHz]"
 #print "Freq [GHz] , p_cmb , p_hwp, p_apt, p_lens, p_fil, p_len, p_opt"
 
-for i in range(0,m):
-    for j in range(0,n):
+for i in range(0,m1):
+    for j in range(0,n1):
         freq_l, freq_h = f.FreqRange(freqLFT[i][j],bandLFT[i][j])
         hwp_eff = f.Hwp(hwp_emiss_LFT[i][j], ref_hwp_LFT[i][j])
         
@@ -168,11 +171,11 @@ for i in range(0,m):
 
 ####################### HFT noise calculation ############################
 
-NETarrHFT=([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
-NETarrHFTmargin=([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
+NETarrHFT=([[0.,0.,0.,0.,0],[0.,0.,0.,0.,0.]])
+NETarrHFTmargin=([[0.,0.,0.,0.,0.],[0.,0.,0.,0.,0.]])
 
-for i in range(0,n):
-    for j in range(0,n):
+for i in range(0,m2):
+    for j in range(0,n2):
 
         freq_l, freq_h = f.FreqRange(freqHFT[i][j],bandHFT[i][j])
         hwp_eff = f.Hwp(hwp_emiss_HFT[i][j], ref_hwp_HFT[i][j])
@@ -190,12 +193,12 @@ for i in range(0,n):
                 
             if (confHFT == 2): # Split Refractive Option 
                 
-                if(i==0 or i==1):# MFT lens
+                if(i==0):# MFT lens
                      pm_emiss, pm_eff = f.Trm(t_lens1, n_lens, tan_lens, freq*1.e9, ref_lens)
                      pm_emiss_ref = pm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
                      sm_emiss, sm_eff = f.Trm(t_lens2, n_lens, tan_lens, freq*1.e9, ref_lens)
                      sm_emiss_ref = sm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
-                if(i==2) :# HFT lens
+                if(i==1) :# HFT lens
                      pm_emiss, pm_eff = f.Trm(t_lens3, n_lens, tan_lens, freq*1.e9, ref_lens)
                      pm_emiss_ref = pm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
                      sm_emiss, sm_eff = f.Trm(t_lens4, n_lens, tan_lens, freq*1.e9, ref_lens)
@@ -205,7 +208,7 @@ for i in range(0,n):
             fil_emiss, fil_eff = f.Trm(t_fil, n_fil, tan_fil, freq*1.e9, ref_fil)
             fil_emiss_ref = fil_emiss + ref_fil*f.BB(freq*1.e9, Tr_fil)/f.BB(freq*1.e9, T_fil)
             
-            if (i==0 or i==1): # lens coupled detetor
+            if (i==0): # lens coupled detetor
                 len_emiss, len_eff = f.Trm(t_len, n_len, tan_len, freq*1.e9, ref_len)
                 len_emiss_ref = len_emiss + ref_len*f.BB(freq*1.e9, Tr_len)/f.BB(freq*1.e9, T_len)
 
@@ -274,23 +277,23 @@ for i in range(0,n):
        # print round(freqHFT[i][j],2)," , ",round(Pcmb,3)," , ",round(Phwp,3)," , ",round(Papt,3)," , ",round(Plens,3)," , ",Pfil," , ",round(Plen,3)," , ",round(Popt,3)
 
 NETarr = np.zeros(15)        
-NETarr[0]= NETarrLFTmargin[0][0];
-NETarr[1]= NETarrLFTmargin[1][0];
-NETarr[2]= NETarrLFTmargin[0][1];
+NETarr[0]= NETarrLFTmargin[0][0]; #40
+NETarr[1]= NETarrLFTmargin[1][0]; #50
+NETarr[2]= NETarrLFTmargin[0][1]; #60
   
-NETarr[3]= np.sqrt(1./(1./pow(NETarrLFTmargin[1][1],2.) + 1./pow(NETarrLFTmargin[2][0],2.)));
-NETarr[4]= np.sqrt(1./(1./pow(NETarrLFTmargin[0][2],2.) + 1./pow(NETarrLFTmargin[3][0],2.)));
-NETarr[5]= np.sqrt(1./(1./pow(NETarrLFTmargin[1][2],2.) + 1./pow(NETarrLFTmargin[2][1],2.)));
-NETarr[6]= np.sqrt(1./(1./pow(NETarrLFTmargin[3][1],2.) + 1./pow(NETarrHFTmargin[0][0],2.)));
-NETarr[7]= np.sqrt(1./(1./pow(NETarrLFTmargin[2][2],2.) + 1./pow(NETarrHFTmargin[1][0],2.)));
-NETarr[8]= np.sqrt(1./(1./pow(NETarrLFTmargin[3][2],2.) + 1./pow(NETarrHFTmargin[0][1],2.)));
+NETarr[3]= np.sqrt(1./(1./pow(NETarrLFTmargin[1][1],2.) + 1./pow(NETarrLFTmargin[2][0],2.)));#68
+NETarr[4]= np.sqrt(1./(1./pow(NETarrLFTmargin[0][2],2.) + 1./pow(NETarrLFTmargin[3][0],2.)));#78
+NETarr[5]= np.sqrt(1./(1./pow(NETarrLFTmargin[1][2],2.) + 1./pow(NETarrLFTmargin[2][1],2.)));#89
+NETarr[6]= np.sqrt(1./(1./pow(NETarrLFTmargin[3][1],2.) + 1./pow(NETarrHFTmargin[0][0],2.)));#100
+NETarr[7]= np.sqrt(1./(1./pow(NETarrLFTmargin[2][2],2.) + 1./pow(NETarrHFTmargin[0][1],2.)));#119
+NETarr[8]= np.sqrt(1./(1./pow(NETarrLFTmargin[3][2],2.) + 1./pow(NETarrHFTmargin[0][2],2.)));#140
 
-NETarr[9]= NETarrHFTmargin[1][1];
-NETarr[10]= NETarrHFTmargin[0][2];
-NETarr[11]= NETarrHFTmargin[1][2];
-NETarr[12]= NETarrHFTmargin[2][0];
-NETarr[13]= NETarrHFTmargin[2][1];
-NETarr[14]= NETarrHFTmargin[2][2];
+NETarr[9]= NETarrHFTmargin[0][3];#166
+NETarr[10]= np.sqrt(1./(1./pow(NETarrHFTmargin[0][4],2.) + 1./pow(NETarrHFTmargin[1][0],2.)));#195
+NETarr[11]= NETarrHFTmargin[1][1];#235
+NETarr[12]= NETarrHFTmargin[1][2];#280
+NETarr[13]= NETarrHFTmargin[1][3];#335
+NETarr[14]= NETarrHFTmargin[1][4];#402
 
 Sensitivity =  f.Sigma( NETarr, t);
 Sum_sens = 0
