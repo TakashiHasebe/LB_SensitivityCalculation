@@ -50,6 +50,7 @@ hwp_emiss_HFT, ref_hwp_HFT = op.HFT_Hwp(confHFT) # MM-HWP
 bf_HFT, Fnum_HFT = op.HFT_Apt(confHFT) 
 det_eff_HFT = op.HFT_Det(confHFT) 
 ref_horn = 0.05
+emiss_L1, emiss_L2 = op.HDPE_Emiss(confHFT)
 
 #Sapphire HWP for HFT
 #t_hwp, n_hwp, tan_hwp, ref_hwp_sap = op.Sap_HWP()
@@ -193,16 +194,23 @@ for i in range(0,m2):
                 
             if (confHFT == 2): # Split Refractive Option 
                 
-                if(i==0):# MFT lens
-                     pm_emiss, pm_eff = f.Trm(t_lens1, n_lens, tan_lens, freq*1.e9, ref_lens)
-                     pm_emiss_ref = pm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
-                     sm_emiss, sm_eff = f.Trm(t_lens2, n_lens, tan_lens, freq*1.e9, ref_lens)
-                     sm_emiss_ref = sm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
-                if(i==1) :# HFT lens
-                     pm_emiss, pm_eff = f.Trm(t_lens3, n_lens, tan_lens, freq*1.e9, ref_lens)
-                     pm_emiss_ref = pm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
-                     sm_emiss, sm_eff = f.Trm(t_lens4, n_lens, tan_lens, freq*1.e9, ref_lens)
-                     sm_emiss_ref = sm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
+               # if(i==0):# MFT lens
+                    # pm_emiss, pm_eff = f.Trm(t_lens1, n_lens, tan_lens, freq*1.e9, ref_lens)
+                    # pm_emiss_ref = pm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
+                    # sm_emiss, sm_eff = f.Trm(t_lens2, n_lens, tan_lens, freq*1.e9, ref_lens)
+                    # sm_emiss_ref = sm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
+                # if(i==1) :# HFT lens
+                    # pm_emiss, pm_eff = f.Trm(t_lens3, n_lens, tan_lens, freq*1.e9, ref_lens)
+                    # pm_emiss_ref = pm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
+                    # sm_emiss, sm_eff = f.Trm(t_lens4, n_lens, tan_lens, freq*1.e9, ref_lens)
+                    # sm_emiss_ref = sm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
+                    
+                pm_emiss = emiss_L1[i][j]
+                sm_emiss = emiss_L2[i][j]
+                pm_eff = 1. - pm_emiss - ref_lens
+                sm_eff = 1. - sm_emiss - ref_lens
+                pm_emiss_ref = pm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
+                sm_emiss_ref = sm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
                     
                
             fil_emiss, fil_eff = f.Trm(t_fil, n_fil, tan_fil, freq*1.e9, ref_fil)

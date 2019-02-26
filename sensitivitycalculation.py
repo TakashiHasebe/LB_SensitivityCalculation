@@ -119,8 +119,8 @@ for i in range(0,m):
             p_len = f.BB(freq*1.e9,T_len)*len_emiss*det_eff_LFT
             p_opt = p_cmb + p_hwp + p_apt + p_pm + p_sm + p_fil + p_len + p_20K
 
-           # if freq==freqLFT[i][j]:
-           #     print round(freq,2),", ",round(p_cmb*1.e24, 3),", ",round(p_hwp*1.e24, 3),", ",round(p_apt*1.e24, 3),", ",round(p_pm*1.e24, 3),", ",round(p_sm*1.e24, 3),", ",round(p_fil*1.e24, 3),", ",round(p_len*1.e24, 3),", ",round(p_opt*1.e24, 3),", ",round(p_20K*1.e24, 3)
+            if freq==freqLFT[i][j]:
+                print round(freq,2),", ",round(p_cmb*1.e24, 3),", ",round(p_hwp*1.e24, 3),", ",round(p_apt*1.e24, 3),", ",round(p_pm*1.e24, 3),", ",round(p_sm*1.e24, 3),", ",round(p_fil*1.e24, 3),", ",round(p_len*1.e24, 3),", ",round(p_opt*1.e24, 3),", ",round(p_20K*1.e24, 3),"apt_eff= ",apt_eff
           
             p_opt_arr[k] = p_opt
             p_cmb_arr[k] = p_cmb

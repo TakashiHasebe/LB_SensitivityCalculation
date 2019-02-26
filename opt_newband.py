@@ -82,6 +82,12 @@ def HFT_Det(confHFT):# detector coupling efficiency
   
     return det_eff_HFT 
 
+def HDPE_Emiss(confHFT):# HDPE emissivity
+    emiss_L1 = np.array([[1.89e-2, 2.04e-2, 2.08e-2, 2.22e-2, 2.80e-2],[2.35e-2, 2.69e-2, 3.15e-2, 3.82e-2, 4.73e-2]])
+    emiss_L2 = np.array([[1.89e-2, 2.04e-2, 2.08e-2, 2.22e-2, 2.80e-2],[2.35e-2, 2.69e-2, 3.15e-2, 3.82e-2, 4.73e-2]])
+   
+    return emiss_L1, emiss_L2 
+
 ##### common optics #####
 def Sap_HWP():#Sapphire HWP for HFT
     t_hwp = 15.e-3 #thickness
@@ -108,10 +114,10 @@ def Si_Lens():#Field and Objective Lenses
     return t_lens1, t_lens2,t_lens3,t_lens4, n_lens, tan_lens, ref_lens
 
 def HDPE_Lens():#Field and Objective Lenses
-    t_lens1 = 30.e-3
-    t_lens2 = 45.e-3
-    t_lens3 = 25.e-3
-    t_lens4 = 30.e-3
+    t_lens1 = 50.e-3
+    t_lens2 = 50.e-3
+    t_lens3 = 33.e-3
+    t_lens4 = 33.e-3
    # n_lens = 1.57
     n_lens = 1.52
    # tan_lens = 5.e-5

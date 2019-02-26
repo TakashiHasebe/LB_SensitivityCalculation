@@ -16,6 +16,7 @@ def BB( freq, T):
 
 def Trm (d, n, losstan, freq, ref):
     emiss = 1. - np.exp(-2.*pi*d*n*losstan*freq/c)
+   # emiss = 1. - np.exp(-1.*pi*d*n*losstan*freq/c)
     eff = 1. - ref - emiss
     return emiss, eff
 
