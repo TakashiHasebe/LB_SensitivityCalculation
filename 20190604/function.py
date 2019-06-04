@@ -1,12 +1,12 @@
 import numpy as np
 
 pi = np.pi
-#k_b = 1.3806503e-23
+k_b = 1.3806503e-23
 c = 299792458.
-#h = 6.626068e-34
+h = 6.626068e-34
 
-h = 6.626070040e-34 # by Sophie
-k_b = 1.38064852e-23 # by Sophie
+#h = 6.626070040e-34 # by Sophie
+#k_b = 1.38064852e-23 # by Sophie
 
 def FreqRange(freq, band):
     freq_l = freq*(1.-band/2.)

@@ -1,4 +1,3 @@
-
 import numpy as np
 
 ############################# Optics Temperatures ############################################
@@ -26,15 +25,8 @@ def Temp_Opt():
 
 ##### LFT #####
 def LFT_Hwp(confLFT):#LFT HWP with ARC 
-   # hwp_emiss_LFT = np.array([[3.83e-3, 5.79e-3, 7.52e-3],[4.81e-3, 6.57e-3, 8.59e-3],[6.57e-3, 8.59e-3, 1.15e-2],[7.52e-3, 9.66e-3, 1.35e-2]])
-   # ref_hwp_LFT = np.array([[0.116, 0.03, 0.036],[0.046, 0.033, 0.027],[0.033, 0.027, 0.016],[0.036, 0.02, 0.013]])
     hwp_emiss_LFT = np.array([[0.38e-2, 0.58e-2, 0.75e-2],[0.48e-2, 0.66e-2, 0.97e-2],[0.66e-2, 0.97e-2, 1.35e-2],[0.75e-2, 1.15e-2, 1.61e-2]])
-   # ref_hwp_LFT = np.array([[0.175, 0.068, 0.042],[0.103, 0.051, 0.037],[0.051, 0.037, 0.013],[0.042, 0.028, 0.001]])
     ref_hwp_LFT = np.array([[0.1, 0.068, 0.042],[0.1, 0.051, 0.037],[0.051, 0.037, 0.013],[0.042, 0.028, 0.001]])
-   # ref_hwp_LFT = np.array([[0., 0., 0.],[0.103, 0.051, 0.037],[0.051, 0.037, 0.013],[0.042, 0.028, 0.001]])
-   
-
-   # hwp_holder_LFT = np.array([[0.013, 0.013, 0.013],[0.013, 0.013, 0.013],[0.013, 0.013, 0.013],[0.013, 0.013, 0.013]])
     hwp_holder_LFT = np.array([[1.3e-2, 0.49e-2, 0.15e-2],[0.84e-2, 0.3e-2, 0.06e-2],[1.03e-2, 0.51e-2, 0.13e-2],[0.75e-2, 0.33e-2, 0.04e-2]])
     return hwp_emiss_LFT, ref_hwp_LFT, hwp_holder_LFT
 
@@ -56,7 +48,6 @@ def HFT_Hwp(confHFT):
         hwp_emiss_HFT = np.array([[3.3e-2, 3.3e-2, 3.3e-2],[3.3e-2, 3.3e-2, 3.3e-2],[3.e-2, 3.e-2, 3.e-2]])  
         ref_hwp_HFT = np.array([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
     if confHFT == 2:#transmissive mesh HWP for split HFT
-      #  hwp_emiss_HFT = np.array([[4.4e-2, 2.1e-2, 2.4e-2],[2.7e-2, 1.7e-2, 2.8e-2],[2.1e-2, 1.7e-2, 2.7e-2]])  
         hwp_emiss_HFT = np.array([[4.4e-2, 2.7e-2, 2.1e-2, 1.7e-2, 2.4e-2], [2.1e-2,1.7e-2, 2.1e-2, 1.7e-2, 2.7e-2]])  
         ref_hwp_HFT = np.array([[0, 0, 0, 0, 0.],[0, 0, 0, 0, 0]])
      
@@ -71,13 +62,10 @@ def HFT_Apt(confHFT):
         Fnum_HFT = 2.2
     if confHFT == 2:#split HFT aperture
         bf_HFT = np.array([[2.75,2.75,2.75,2.75,2.75],[3.1, 3.1, 3.1,3.1,3.1]])
-       # bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[2.75,2.75,3.1]])
-       # Fnum_HFT = 3.0
         Fnum_HFT = 2.2
     return bf_HFT, Fnum_HFT 
 
 def HFT_Det(confHFT):# detector coupling efficiency
-    #det_eff_HFT = np.array([[0.68,0.68,0.68],[0.68,0.68,0.68],[0.75,0.85,0.75]])
     det_eff_HFT = np.array([[0.68,0.68,0.68,0.68,0.68],[0.75, 0.75, 0.75,0.75,0.75]])
   
     return det_eff_HFT 

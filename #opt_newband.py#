@@ -128,7 +128,7 @@ def HDPE_Lens():#Field and Objective Lenses
      
     return t_lens1, t_lens2,t_lens3,t_lens4,n_lens, tan_lens, ref_lens
 
-
+3.e-4
 def Fil():#2K filter
     t_fil = 5.e-3
     n_fil = 1.5
