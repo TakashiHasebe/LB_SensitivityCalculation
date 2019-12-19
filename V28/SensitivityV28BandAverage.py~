@@ -1,8 +1,10 @@
 import numpy as np
 import function as f
 import fp as fp
-import opt as op
+import optBandAverage as op
 import matplotlib.pyplot as plt
+from scipy.integrate import quad, trapz
+import bigfloat
 
 pi = f.pi
 k_b = f.k_b
@@ -11,11 +13,11 @@ h= f.h
 
 ########################## Telescope Configrations #############################
 confLFT = 0
-confHFT = 2
+confHFT = 0 #MHFT V28 
 
 
 ########################### Duty cycle ##########################
-DC = 1.0
+DC = 0.85
 
 
 #######################################################################
@@ -47,17 +49,15 @@ bf_LFT, Fnum_LFT = op.LFT_Apt(confLFT)
 det_eff_LFT = op.LFT_Det(confLFT) 
 
 #HFT
-hwp_emiss_HFT, ref_hwp_HFT = op.HFT_Hwp(confHFT) # MM-HWP
+hwp_emiss_HFT, ref_hwp_HFT, pol_hwp_HFT, pol_dil_HFT = op.HFT_Hwp(confHFT) # MM-HWP
 bf_HFT, Fnum_HFT = op.HFT_Apt(confHFT) 
 det_eff_HFT = op.HFT_Det(confHFT) 
 ref_horn = 0.05
-emiss_L1, emiss_L2 = op.HDPE_Emiss(confHFT)
+emiss_L1, emiss_L2, ref_L1, ref_L2 = op.HFT_Lens(confHFT)
                    
 #Mirror 
 epsilon, rho, rms = op.Mir()
 
-#Field and Objective Lenses
-t_lens1,t_lens2, t_lens3, t_lens4,n_lens, tan_lens, ref_lens = op.HDPE_Lens()
 
 #2K filter
 t_fil, n_fil, tan_fil, ref_fil =op.Fil()
@@ -78,8 +78,19 @@ dpdt_arr = np.zeros(num)
 NETarrLFT=([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
 NETarrLFTmargin=([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
 
-print "Freq [GHz] , Popt [pW] , Psat [pW] ,NEPph [aW/rtHz] , NEPg [aW/rtHz] , NEPread [aW/rtHz] , NEPdet [aW/rtHz] , NETdet [microK/rtHz] , NETarr [microK/rtHz] , NETarrmargin [microK/rtHz]"
-#print "Freq [GHz] , p_cmb , p_hwp, p_apt, p_lens, p_fil, p_len, p_opt"
+def f_hwp(freq):
+    p_hwp= f.BB(freq*1.e9,T_hwp_HFT)
+    return p_hwp
+
+def f_hwp_ref(freq):
+    p_hwp_ref= f.BB(freq*1.e9,Tr_hwp)
+    return p_hwp_ref
+
+
+#print "Freq [GHz] , Popt [pW] , NEPph [aW/rtHz] , NEPg [aW/rtHz] , NEPread [aW/rtHz] , NEPint [aW/rtHz] , NEPext [aW/rtHz] , NEPdet [aW/rtHz] , NETdet [microK/rtHz] , NETarr [microK/rtHz] "
+
+print "Freq [GHz] , p_opt, p_cmb , p_hwp, p_apt, p_L1, p_L2, p_fil, p_len, p_det"
+#print "Freq [GHz] , eff_total, eff_hwp, eff_apt, eff_L1, eff_L2, eff_fil, eff_feed, eff_det, eff_pol, eff_dil"
 
 for i in range(0,m1):
     for j in range(0,n1):
@@ -87,7 +98,7 @@ for i in range(0,m1):
         hwp_eff = f.Hwp(hwp_emiss_LFT[i][j], ref_hwp_LFT[i][j])
         
         for k in range(0,num):
-            #freq = freq_l+(freq_h - freq_l)*k/(num-1)
+            freq = freq_l+(freq_h - freq_l)*k/(num-1)
             freq = freq_l+(freq_h - freq_l)*k/num
             hwp_emiss_ref = hwp_emiss_LFT[i][j] + ref_hwp_LFT[i][j]*f.BB(freq*1.e9, Tr_hwp)/f.BB(freq*1.e9, T_hwp_LFT)
             apt_emiss, apt_eff = f.Aperture(dpixLFT[i][j]*1.e-3, bf_LFT, Fnum_LFT, freq*1.e9)
@@ -133,10 +144,8 @@ for i in range(0,m1):
 
            # if freq==freqLFT[i][j]:
            #     print round(freq,2),", ",round(p_cmb*1.e24, 3),", ",round(p_hwp*1.e24, 3),", ",round(p_apt*1.e24, 3),", ",round(p_pm*1.e24, 3),", ",round(p_sm*1.e24, 3),", ",round(p_fil*1.e24, 3),", ",round(p_len*1.e24, 3),", ",round(p_opt*1.e24, 3),", ",round(p_20K*1.e24, 3)
-            if freq==freqLFT[0][0]:
-                 print round(freq,2),", ",p_hwp,", ",p_apt,", ",p_20K,", ",p_pm,", ",p_sm,", ",p_fil,", ",p_len,",",p_opt
-                #print round(freq,2),", ",p_hwp
-                
+               # print round(freq,2),", ",round(apt_eff, 3)
+
             
             p_opt_arr[k] = p_opt
             p_cmb_arr[k] = p_cmb
@@ -173,9 +182,8 @@ for i in range(0,m1):
         NETarrLFT[i][j] = NETdet/np.sqrt(2.*npixLFT[i][j])  
         NETarrLFTmargin[i][j] = NETdet*1.15/np.sqrt(2.*npixLFT[i][j]*0.8)  
 
-        #print round(freqLFT[i][j],2)," , ",round(Popt,2)," , ",round(Psat,2)," , ",round(NEPopt,2)," , ",round(NEPth,2)," , ",round(NEPread,2)," , ",round(NEPint,2)," , ",round(NETdet,2)," , ",round(NETarrLFT[i][j],2)," , ",round(NETarrLFTmargin[i][j],2)
+       # print round(freqLFT[i][j],2)," , ",round(Popt,2)," , ",round(Psat,2)," , ",round(NEPopt,2)," , ",round(NEPth,2)," , ",round(NEPread,2)," , ",round(NEPint,2)," , ",round(NETdet,2)," , ",round(NETarrLFT[i][j],2)," , ",round(NETarrLFTmargin[i][j],2)
        # print round(freqLFT[i][j],2)," , ",round(Pcmb,3)," , ",round(Phwp,3)," , ",round(Papt,3)," , ",round(Plens,3)," , ",Pfil," , ",round(Plen,3)," , ",round(P20K,3)," , ",round(Popt,3)
-       # print round(freqLFT[i][j],2)," , ",round(Pcmb,5)
 
 ##########################################################################
 
@@ -189,47 +197,56 @@ for i in range(0,m2):
 
         freq_l, freq_h = f.FreqRange(freqHFT[i][j],bandHFT[i][j])
         hwp_eff = f.Hwp(hwp_emiss_HFT[i][j], ref_hwp_HFT[i][j])
+        hwp_emiss = hwp_emiss_HFT[i][j]
+        hwp_emiss_ref = hwp_emiss_HFT[i][j] + ref_hwp_HFT[i][j]*f.BB(freq*1.e9, Tr_hwp)/f.BB(freq*1.e9, T_hwp_HFT)
+        ref_hwp = ref_hwp_HFT[i][j]
+        apt_emiss, apt_eff = f.Aperture(dpixHFT[i][j]*1.e-3, bf_HFT[i][j], Fnum_HFT[i][j], freqHFT[i][j]*1.e9)
+        apt_eff = round(apt_eff,3)
+        pm_emiss = emiss_L1[i][j]
+        sm_emiss = emiss_L2[i][j]
+        pm_eff = 1. - pm_emiss - ref_L1[i][j]
+        sm_eff = 1. - sm_emiss - ref_L2[i][j]
+        fil_emiss, fil_eff = f.Trm(t_fil, n_fil, tan_fil, freqHFT[i][j]*1.e9, ref_fil)
+        fil_eff = round(fil_eff,3)
+        det_eff = det_eff_HFT[i][j]
         
+        if (i==0): # lens coupled detetor
+            len_emiss, len_eff = f.Trm(t_len, n_len, tan_len, freqHFT[i][j]*1.e9, ref_len)
+            #len_emiss, len_eff = f.Trm(t_len, n_len, tan_len, freq*1.e9, ref_len)
+            len_emiss_ref = len_emiss + ref_len*f.BB(freq*1.e9, Tr_len)/f.BB(freq*1.e9, T_len)
+
+        else: # horn coupled detector
+            len_emiss = 0.
+            len_eff = 1.-ref_horn
+            len_emiss_ref = len_emiss + ref_horn*f.BB(freq*1.e9, Tr_horn)/f.BB(freq*1.e9,T_len)
+
+        len_eff = round(len_eff,3)
+
         for k in range(0,num):
-            freq = freq_l+(freq_h - freq_l)*k/(num-1)
+           # freq = freq_l+(freq_h - freq_l)*k/(num-1)
+            freq = freq_l+(freq_h - freq_l)*k/(num)
+            hwp_eff = 1.- hwp_emiss_HFT[i][j] - ref_hwp_HFT[i][j]
+        
             hwp_emiss_ref = hwp_emiss_HFT[i][j] + ref_hwp_HFT[i][j]*f.BB(freq*1.e9, Tr_hwp)/f.BB(freq*1.e9, T_hwp_HFT)
-            apt_emiss, apt_eff = f.Aperture(dpixHFT[i][j]*1.e-3, bf_HFT[i][j], Fnum_HFT, freq*1.e9)
+            #apt_emiss, apt_eff = f.Aperture(dpixHFT[i][j]*1.e-3, bf_HFT[i][j], Fnum_HFT[i][j], freq*1.e9)
             
-            if (confHFT == 0): # Reflective Option 
-                pm_emiss, pm_eff, pm_loss = f.Mirror(freq*1.e9, rho, epsilon, rms)
-                pm_emiss_ref = pm_emiss + pm_loss*f.BB(freq*1.e9, Tr_mir)/f.BB(freq*1.e9, T_mir)
-                sm_emiss, sm_eff, sm_loss = f.Mirror(freq*1.e9, rho, epsilon, rms)
-                sm_emiss_ref = sm_emiss + sm_loss*f.BB(freq*1.e9, Tr_mir)/f.BB(freq*1.e9, T_mir)
-                
-            if (confHFT == 2): # Split Refractive Option 
-                pm_emiss = emiss_L1[i][j]
-                sm_emiss = emiss_L2[i][j]
-                pm_eff = 1. - pm_emiss - ref_lens
-                sm_eff = 1. - sm_emiss - ref_lens
-                pm_emiss_ref = pm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
-                sm_emiss_ref = sm_emiss + ref_lens*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
+            pm_emiss_ref = pm_emiss + ref_L1[i][j]*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
+            sm_emiss_ref = sm_emiss + ref_L2[i][j]*f.BB(freq*1.e9, Tr_lens)/f.BB(freq*1.e9, T_lens)
                
-            fil_emiss, fil_eff = f.Trm(t_fil, n_fil, tan_fil, freq*1.e9, ref_fil)
+               
+           # fil_emiss, fil_eff = f.Trm(t_fil, n_fil, tan_fil, freq*1.e9, ref_fil)
             fil_emiss_ref = fil_emiss + ref_fil*f.BB(freq*1.e9, Tr_fil)/f.BB(freq*1.e9, T_fil)
             
-            if (i==0): # lens coupled detetor
-                len_emiss, len_eff = f.Trm(t_len, n_len, tan_len, freq*1.e9, ref_len)
-                len_emiss_ref = len_emiss + ref_len*f.BB(freq*1.e9, Tr_len)/f.BB(freq*1.e9, T_len)
-
-            else: # horn coupled detector
-                len_emiss = 0.
-                len_eff = 1.-ref_horn
-                len_emiss_ref = len_emiss + ref_horn*f.BB(freq*1.e9, Tr_horn)/f.BB(freq*1.e9,T_len)
-
-           # if freq==freqHFT[i][j]:
-               # print round(freq,2),"hwp_emiss, ",hwp_emiss_HFT[i][j],"apt_emiss, ",apt_emiss,"lens1_emiss, ",pm_emiss,"lens2_eff, ",sm_emiss,"2Kfilter_emiss, ",fil_emiss,"lenslet_emiss, ",len_emiss
+        
+            #if freq==freqHFT[i][j]:
+               # print round(freq,2),"hwp_emiss, ",hwp_emiss_HFT[i][j],"apt_eff ",apt_eff,"lens1_eff, ",pm_eff,"lens2_eff, ",sm_eff,"2Kfilter_eff, ",fil_eff,"lenslet_eff, ",len_eff, "det_eff= ",det_eff_HFT[i][j]
            
             ###### reflection effect ##### 
-            hwp_emiss = hwp_emiss_ref
-            len_emiss = len_emiss_ref
-            fil_emiss = fil_emiss_ref
-            pm_emiss = pm_emiss_ref
-            sm_emiss = sm_emiss_ref
+            #hwp_emiss = hwp_emiss_ref
+            #len_emiss = len_emiss_ref
+            #fil_emiss = fil_emiss_ref
+            #pm_emiss = pm_emiss_ref
+            #sm_emiss = sm_emiss_ref
             ##############################
             p_cmb = f.BB(freq*1.e9,T_cmb)*hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
             p_hwp = f.BB(freq*1.e9,T_hwp_HFT)*hwp_emiss_HFT[i][j]*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
@@ -242,10 +259,12 @@ for i in range(0,m2):
      
             p_opt = p_cmb + p_hwp + p_apt + p_pm + p_sm + p_fil + p_len 
 
-           # if freq==freqHFT[i][j]:
+            eff = hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]*pol_hwp_HFT[i][j]*pol_dil_HFT[i][j]
 
-           # print round(freq,2),", ",p_cmb,", ",p_hwp,", ",p_apt,", ",p_pm,", ",p_sm,", ",p_fil,", ",p_len,", ",p_det
-            eff = hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
+            #if freq==freqHFT[i][j]:
+
+            #    print round(freq,2),", ",eff," , ",hwp_eff," , ",apt_eff,", ",pm_eff,", ",sm_eff,", ",fil_eff,", ",len_eff,", ",det_eff_HFT[i][j],", ",pol_hwp_HFT[i][j],", ",pol_dil_HFT[i][j]
+               # print round(freq,2),", ",round(p_cmb*1.e24, 3),", ",p_hwp,", ",round(p_apt*1.e24, 3),", ",round(p_pm*1.e24, 3),", ",round(p_sm*1.e24, 3),", ",round(p_fil*1.e24, 3),", ",round(p_len*1.e24, 3),", ",round(p_opt*1.e24, 3),", ",round(p_20K*1.e24, 3)
                    
             p_opt_arr[k] = p_opt
             p_cmb_arr[k] = p_cmb
@@ -262,7 +281,15 @@ for i in range(0,m2):
                  
         Popt = np.sum(p_opt_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
         Pcmb = np.sum(p_cmb_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
-        Phwp = np.sum(p_hwp_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
+        #Phwp = np.sum(p_hwp_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
+        av_emi = hwp_emiss *apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff
+        av_ref = ref_hwp *apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff
+     
+       # BB_hwp_ref = quad(f_hwp_ref, freq_l, freq_h)
+        P_hwp =f.BB(freqHFT[i][j]*1.e9,T_hwp_HFT)*hwp_emiss**apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff
+        P_hwp_ref = f.BB(freqHFT[i][j]*1.e9,Tr_hwp)*ref_hwp*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff
+        P_hwp = P_hwp + P_hwp_ref
+        P_hwp = f.BB(freq*1.e9,T_hwp_HFT)*hwp_emiss_ref*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff
         Papt = np.sum(p_apt_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
         Plens = np.sum(p_lens_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
         Pfil = np.sum(p_fil_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
@@ -274,16 +301,18 @@ for i in range(0,m2):
         NEPth = np.sqrt(4.*k_b*Psat*1.e-12*T_bath*(3.+1.)**2./(2.*3.+3.)*(1.71**(2.*3.+3.)-1.)/((1.71**(3.+1.)-1.)**2.))*1.e18
         NEPread = np.sqrt(0.21*(NEPopt**2.+NEPth**2.))
         NEPint = np.sqrt(NEPopt**2. + NEPth**2. + NEPread**2.)
+        NEPext = np.sqrt(0.32)*np.sqrt(NEPint**2.)
+        NEPdet = np.sqrt(NEPint**2. + NEPext**2.)
         DPDT = np.sum(dpdt_arr)*(freq_h-freq_l)*1.e9/num
-        NETdet = NEPint*1.e-18/np.sqrt(2.)/DPDT*1.e6 # in unit of microK
-        NETarrHFT[i][j] = NETdet/np.sqrt(2.*npixHFT[i][j])  
-        NETarrHFTmargin[i][j] = NETdet*1.15/np.sqrt(2.*npixHFT[i][j]*0.8)  
+        NETdet = NEPdet*1.e-18/np.sqrt(2.)/DPDT*1.e6 # in unit of microK
+        #NETarrHFT[i][j] = NETdet/np.sqrt(2.*npixHFT[i][j])  
+        NETarrHFTmargin[i][j] = NETdet/np.sqrt(2.*npixHFT[i][j]*0.8)  
 
 
-        print round(freqHFT[i][j],2)," , ",round(npixHFT[i][j],0)," , ",round(Popt,8)," , ",round(NEPopt,8)," , ",round(NEPth,3)," , ",round(NEPread,3)," , ",round(NEPint,2)," , ",round(NETdet,2)," , ",round(NETarrHFT[i][j],2)," , ",round(NETarrHFTmargin[i][j],2)
-
- 
-       # print round(freqHFT[i][j],2)," , ",round(Pcmb,3)," , ",round(Phwp,3)," , ",round(Papt,3)," , ",round(Plens,3)," , ",Pfil," , ",round(Plen,3)," , ",round(Popt,3)
+       # print round(freqHFT[i][j],2)," , ",round(Popt,8)," , ",round(NEPopt,8)," , ",round(NEPth,8)," , ",round(NEPread,8)," , ",round(NEPint,8)," , ",round(NEPext,8)," , ",round(NEPdet,8)," , ",round(NETdet,8)," , ",round(NETarrHFTmargin[i][j],8)
+   
+       # print round(freqHFT[i][j],2)," , ",round(Pcmb,3)," , ",Phwp,8," , ",round(Papt,3)," , ",round(Plens,3)," , ",Pfil," , ",round(Plen,3)," , ",round(Popt,3)
+        print round(freqHFT[i][j],2)," , ",P_hwp," , av_emi= ", av_emi ," ,av_ref= ", av_ref, " ,ref_hwp=", ref_hwp," ,",apt_eff," , ",pm_eff," , ",sm_eff," , ",fil_eff," , ",len_eff, " , ", det_eff
 
 NETarr = np.zeros(15)        
 NETarr[0]= NETarrLFTmargin[0][0]; #40

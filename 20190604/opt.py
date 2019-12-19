@@ -32,6 +32,7 @@ def LFT_Hwp(confLFT):#LFT HWP with ARC
 
 def LFT_Apt(confLFT):# LFT aperture 
     bf_LFT = 2.75 #beam waist factor
+   # bf_LFT = 2.75*1.1 #beam waist factor
     Fnum_LFT = 3. #F number
     return bf_LFT, Fnum_LFT
 

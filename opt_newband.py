@@ -48,47 +48,28 @@ def LFT_Det(confLFT):# detector coupling efficiency
     return det_eff_LFT 
 
 ##### HFT #####
-def HFT_Hwp(confHFT):
-    if confHFT == 0:#embedded mesh HWP for reflective HFT   
-        hwp_emiss_HFT = np.array([[2.1e-2,2.1e-2,2.1e-2],[2.1e-2,2.1e-2,2.1e-2],[2.1e-2,2.1e-2,2.1e-2]])  
-        ref_hwp_HFT = np.array([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
-    if confHFT == 1:#transmissive mesh HWP for split HFT
-        hwp_emiss_HFT = np.array([[3.3e-2, 3.3e-2, 3.3e-2],[3.3e-2, 3.3e-2, 3.3e-2],[3.e-2, 3.e-2, 3.e-2]])  
-        ref_hwp_HFT = np.array([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
-    if confHFT == 2:#transmissive mesh HWP for split HFT
-      #  hwp_emiss_HFT = np.array([[4.4e-2, 2.1e-2, 2.4e-2],[2.7e-2, 1.7e-2, 2.8e-2],[2.1e-2, 1.7e-2, 2.7e-2]])  
-        hwp_emiss_HFT = np.array([[4.4e-2, 2.7e-2, 2.1e-2, 1.7e-2, 2.4e-2], [2.1e-2,1.7e-2, 2.1e-2, 1.7e-2, 2.7e-2]])  
-        ref_hwp_HFT = np.array([[0, 0, 0, 0, 0.],[0, 0, 0, 0, 0]])
+def MFT_Hwp():
+    hwp_emiss_MFT = np.array([4.4e-2, 2.7e-2, 2.1e-2, 1.7e-2, 2.4e-2])  
+    ref_hwp_MFT = np.array([0, 0, 0, 0, 0.])
      
-    return hwp_emiss_HFT, ref_hwp_HFT 
+    return hwp_emiss_MFT, ref_hwp_MFT
 
-def HFT_Apt(confHFT):
-    if confHFT == 0:#reflective HFT aperture
-        bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[3.1,3.1,3.1]])
-        Fnum_HFT = 3.5
-    if confHFT == 1:#split HFT aperture
-        bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[3.1,3.1,3.1]])
-        Fnum_HFT = 2.2
-    if confHFT == 2:#split HFT aperture
-        bf_HFT = np.array([[2.75,2.75,2.75,2.75,2.75],[3.1, 3.1, 3.1,3.1,3.1]])
-       # bf_HFT = np.array([[2.75,2.75,2.75],[2.75,2.75,2.75],[2.75,2.75,3.1]])
-       # Fnum_HFT = 3.0
-        Fnum_HFT = 2.2
-    return bf_HFT, Fnum_HFT 
+def MFT_Apt():
+    bf_MFT = 2.75
+    Fnum_MFT = 2.2
+    return bf_MFT, Fnum_MFT 
 
-def HFT_Det(confHFT):# detector coupling efficiency
-    #det_eff_HFT = np.array([[0.68,0.68,0.68],[0.68,0.68,0.68],[0.75,0.85,0.75]])
-    det_eff_HFT = np.array([[0.68,0.68,0.68,0.68,0.68],[0.75, 0.75, 0.75,0.75,0.75]])
+def MFT_Det():# detector coupling efficiency
+    det_eff_MFT = 0.68
   
-    return det_eff_HFT 
+    return det_eff_MFT 
 
-def HDPE_Emiss(confHFT):# HDPE emissivity
-   # emiss_L1 = np.array([[1.89e-2, 2.04e-2, 2.08e-2, 2.22e-2, 2.80e-2],[2.35e-2, 2.69e-2, 3.15e-2, 3.82e-2, 4.73e-2]])
-   # emiss_L2 = np.array([[1.89e-2, 2.04e-2, 2.08e-2, 2.22e-2, 2.80e-2],[2.35e-2, 2.69e-2, 3.15e-2, 3.82e-2, 4.73e-2]])
-    emiss_L1 = np.array([[1.8e-2, 1.91e-2, 2.03e-2, 2.21e-2, 2.45e-2],[2.21e-2, 2.37e-2, 2.69e-2, 3.17e-2, 3.82e-2]])
-    emiss_L2 = np.array([[1.8e-2, 1.91e-2, 2.03e-2, 2.21e-2, 2.45e-2],[2.21e-2, 2.37e-2, 2.69e-2, 3.17e-2, 3.82e-2]])
+def MFT_Lens():# HDPE emissivity
+    emiss_L1 = np.array([1.8e-2, 1.91e-2, 2.03e-2, 2.21e-2, 2.45e-2])
+    emiss_L2 = np.array([1.8e-2, 1.91e-2, 2.03e-2, 2.21e-2, 2.45e-2])
+    ref_lens = 0.03 
    
-    return emiss_L1, emiss_L2 
+    return emiss_L1, emiss_L2, ref_lens 
 
 ##### common optics #####
 def Sap_HWP():#Sapphire HWP for HFT

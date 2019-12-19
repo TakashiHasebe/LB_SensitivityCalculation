@@ -17,21 +17,29 @@ def Temp_Opt():
     Tr_fil = T_bath # reflected temp of filter
     Tr_len = T_bath # reflected temp of detector lenslet
     Tr_lens = 5. # reflected temp of HFT-lens
-   
-    return  T_bath, T_cmb, T_hwp_LFT,T_hwp_HFT,T_apt, T_mir, T_fil, T_len, T_lens, T_baf, Tr_hwp,Tr_mir,Tr_fil,Tr_len,Tr_lens
+    Tr_horn = 2. # reflected temp of HFT-lens
+    Tr_det = 0.17
+    return  T_bath, T_cmb, T_hwp_LFT,T_hwp_HFT,T_apt, T_mir, T_fil, T_len, T_lens, T_baf, Tr_hwp,Tr_mir,Tr_fil,Tr_len,Tr_lens,Tr_horn,Tr_det
 
 
 ################################# Optics parameters ##########################################
 
 ##### LFT #####
 def LFT_Hwp(): #LFT HWP with ARC 
-    hwp_emiss_LFT = np.array([[0.38e-2, 0.58e-2, 0.75e-2],[0.48e-2, 0.66e-2, 0.97e-2],[0.66e-2, 0.97e-2, 1.35e-2],[0.75e-2, 1.15e-2, 1.61e-2]]) #emissivity
-    ref_hwp_LFT = np.array([[0.1, 0.068, 0.042],[0.1, 0.051, 0.037],[0.051, 0.037, 0.013],[0.042, 0.028, 0.001]]) #reflectance
+    #hwp_emiss_LFT = np.array([[0.38e-2, 0.58e-2, 0.75e-2],[0.48e-2, 0.66e-2, 0.97e-2],[0.66e-2, 0.97e-2, 1.35e-2],[0.75e-2, 1.15e-2, 1.61e-2]]) #emissivity
+    #ref_hwp_LFT = np.array([[0.1, 0.068, 0.042],[0.1, 0.051, 0.037],[0.051, 0.037, 0.013],[0.042, 0.028, 0.001]]) #reflectance
     #pol_hwp_LFT = np.array([[0.783, 0.965, 0.960],[0.929, 0.961, 0.970],[0.961, 0.970, 0.982],[0.960, 0.980, 0.964]]) #polarization eff
-    pol_hwp_LFT = np.array([[0.87, 0.965, 0.960],[0.929, 0.961, 0.970],[0.961, 0.970, 0.982],[0.960, 0.980, 0.964]]) #polarization eff
-    pol_dil_LFT = np.array([[0.984, 0.984, 0.984],[0.984, 0.984, 0.984],[0.984, 0.984, 0.984],[0.984, 0.984, 0.984]]) #polarization dilution factor
-    return hwp_emiss_LFT, ref_hwp_LFT, pol_hwp_LFT, pol_dil_LFT
+    #pol_dil_LFT = np.array([[0.984, 0.984, 0.984],[0.984, 0.984, 0.984],[0.984, 0.984, 0.984],[0.984, 0.984, 0.984]]) #polarization dilution factor
+    eff_hwp_LFT = np.array([[0.906, 0.962, 0.961],[0.952, 0.963, 0.969],[0.963, 0.969, 0.978],[0.961, 0.975, 0.976]]) #efficiency
+    ref_hwp_LFT = np.array([[0.091, 0.033, 0.032],[0.043, 0.031, 0.024],[0.031, 0.024, 0.012],[0.032, 0.016, 0.013]]) #reflectance
+    pol_hwp_LFT = np.array([[0.866, 0.997, 0.993],[0.972, 0.996, 0.996],[0.996, 0.996, 0.991],[0.993, 0.997, 0.971]]) #polarization eff
+    pol_dil_LFT = np.array([[1, 1, 1],[1, 1, 1],[1, 1, 1],[1, 1, 1]]) #polarization dilution factor
+    return eff_hwp_LFT, ref_hwp_LFT, pol_hwp_LFT, pol_dil_LFT
 
+def LFT_Apt():# LFT cold aperture stop 
+    bf_LFT = 2.75 #beam waist factor
+    Fnum_LFT = 1.92 #F number
+    return bf_LFT, Fnum_LFT
 
 def LFT_Spill():
     spill_5Kenve = np.array([[0.495, 0.222, 0.100],[0.340, 0.155, 0.067],[0.413, 0.232, 0.095],[0.317, 0.166, 0.059]]) #spillover at 5K envelope
@@ -41,15 +49,16 @@ def LFT_Spill():
     return spill_5Kenve, spill_5Khood, spill_20K, apt_eff
 
 def LFT_Det():# detector coupling efficiency
-    det_eff_LFT =  np.array([[0.68, 0.68, 0.68 ],[0.68, 0.68, 0.68],[0.68, 0.68, 0.68],[0.68, 0.68, 0.68]]) 
+    #det_eff_LFT =  np.array([[0.68, 0.68, 0.68 ],[0.68, 0.68, 0.68],[0.68, 0.68, 0.68],[0.68, 0.68, 0.68]]) 
+    det_eff_LFT =  np.array([[0.76, 0.76, 0.76 ],[0.76, 0.76, 0.76],[0.76, 0.76, 0.76],[0.76, 0.76, 0.76]]) 
     return det_eff_LFT 
-
 ##### MHFT #####
 def HFT_Hwp():
     hwp_emiss_HFT = np.array([[0.035, 0.024, 0.019, 0.015, 0.014],[0.053, 0.033, 0.025, 0.020, 0.023]])  #emissivity
     ref_hwp_HFT   = np.array([[0.010, 0.019, 0.024, 0.012, 0.010],[0.025, 0.021, 0.025, 0.013, 0.009]]) #reflectance
     pol_hwp_HFT   = np.array([[0.987, 0.955, 0.938, 0.956, 0.984],[0.981, 0.966, 0.955, 0.977, 0.984]]) # polarization efficiency
-    pol_dil_HFT   = np.array([[0.988, 0.988, 0.988, 0.988, 0.988],[0.972, 0.972, 0.972, 0.972, 0.972]]) # HWP rotation dilution factor
+    #pol_dil_HFT   = np.array([[0.988, 0.988, 0.988, 0.988, 0.988],[0.972, 0.972, 0.972, 0.972, 0.972]]) # HWP rotation dilution factor
+    pol_dil_HFT   = np.array([[1, 1, 1, 1, 1],[1, 1, 1, 1, 1]]) # HWP rotation dilution factor
     return hwp_emiss_HFT, ref_hwp_HFT, pol_hwp_HFT, pol_dil_HFT 
 
 def HFT_Apt():
@@ -58,7 +67,8 @@ def HFT_Apt():
     return bf_HFT, Fnum_HFT 
 
 def HFT_Det():# detector coupling efficiency
-    det_eff_HFT = np.array([[0.68,0.68,0.68,0.68,0.68],[0.75, 0.75, 0.75,0.75,0.75]])
+    #det_eff_HFT = np.array([[0.68,0.68,0.68,0.68,0.68],[0.75, 0.75, 0.75,0.75,0.75]])
+    det_eff_HFT = np.array([[0.76,0.76,0.76,0.76,0.76],[0.75, 0.75, 0.75,0.75,0.75]])
     return det_eff_HFT 
 
 

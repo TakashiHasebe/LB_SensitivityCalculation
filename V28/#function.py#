@@ -7,8 +7,7 @@ c = 299792458.
 
 h = 6.626070040e-34 # by Sophie
 k_b = 1.38064852e-23 # by Sophie
-
-def FreqRange(freq, band):
+195.0  ,  1.73911571989e-24  , av_emi=  0.00741716296456  ,av_ref=  0.00529797354611def FreqRange(freq, band):
     freq_l = freq*(1.-band/2.)
     freq_h = freq*(1.+band/2.)
     return freq_l, freq_h
@@ -46,19 +45,3 @@ def dPdT(freq, eff, T_cmb):
 def Sigma(NET, t):
     sigma = np.sqrt(4.*pi*2.*NET*NET/t)*10800./pi;
     return sigma
-
-def Emiss (d, n, losstan, freq, ref):
-    emiss = 1. - np.exp(-2.*pi*d*n*losstan*freq/c)
-   # emiss = 1. - np.exp(-1.*pi*d*n*losstan*freq/c)
-   # eff = 1. - ref - emiss
-    return emiss
-
-def Eff (d, n, losstan, freq, ref):
-    emiss = 1. - np.exp(-2.*pi*d*n*losstan*freq/c)
-   # emiss = 1. - np.exp(-1.*pi*d*n*losstan*freq/c)
-    eff = 1. - ref - emiss
-    return eff
-
-def AptEff( dpix, beamwaistfactor, Fnum, freq_c):
-    apt_eff = 1. - np.exp(-1.*pi**2./2.*(dpix/beamwaistfactor/Fnum*freq_c/c)**2.) # aperture efficiency
-    return apt_eff

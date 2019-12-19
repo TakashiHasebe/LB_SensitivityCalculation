@@ -1,8 +1,8 @@
 
 import numpy as np
 import function as f
-import fp_newband as fp
-import opt_newband as op
+import fp as fp
+import optBandAverage as op
 import matplotlib.pyplot as plt
 from scipy.integrate import quad, trapz
 import bigfloat
@@ -11,6 +11,8 @@ pi = f.pi
 k_b = f.k_b
 c= f.c
 h= f.h
+
+confHFT=0
 
 ########################### Duty cycle ##########################
 DC = 1.0
@@ -32,7 +34,7 @@ T_horn = T_bath
 Tr_len = T_baf
 Tr_horn = T_baf
 ################################ FP parameters ##########################################
-freqMFT,bandMFT,dpixMFTarr, npixMFT = fp.MFT_FP()
+freqMFT,bandMFT,dpixMFTarr, npixMFT = fp.HFT_FP()
 #dpixMFT = 12.e-3
 
 
@@ -40,10 +42,10 @@ freqMFT,bandMFT,dpixMFTarr, npixMFT = fp.MFT_FP()
 ################################# Optics parameters ##########################################
 
 #MFT HWP
-hwp_emiss_MFTarr, ref_hwp_MFTarr = op.MFT_Hwp()
+hwp_emiss_MFTarr, ref_hwp_MFTarr = op.HFT_Hwp()
 #LFT
 #MFT Aperture
-bf_MFT, Fnum_MFT = op.MFT_Apt()
+bf_MFT, Fnum_MFT = op.HFT_Apt()
 
 
                        
@@ -51,7 +53,7 @@ bf_MFT, Fnum_MFT = op.MFT_Apt()
 epsilon, rho, rms = op.Mir()
 
 #Field and Objective Lenses
-lens_emiss_MFTarr1, lens_emiss_MFTarr2, ref_lens_MFT = op.MFT_Lens()
+lens_emiss_MFTarr1, lens_emiss_MFTarr2, ref_lens_MFT1,ref_lens_MFT2 = op.HFT_Lens()
 
 #2K filter
 t_fil, n_fil, tan_fil, ref_fil =op.Fil()
@@ -59,7 +61,7 @@ t_fil, n_fil, tan_fil, ref_fil =op.Fil()
 # detector lenslet
 t_len, n_len, tan_len, ref_len =op.Len()
 
-det_eff_MFT = op.MFT_Det()
+det_eff_MFT = op.HFT_Det()
 
 ####################### function definition ##################################
  #  def Popt(self, elemArr, emissArr, effArr, tempArr, freqs):
@@ -101,10 +103,10 @@ for i in range(0,n):
         hwp_eff_MFT = 1. - hwp_emiss_MFT - ref_hwp_MFT
 
         lens_emiss_MFT1 = lens_emiss_MFTarr1[i]
-        lens_eff_MFT1 = 1. - lens_emiss_MFT1 - ref_lens_MFT
+        lens_eff_MFT1 = 1. - lens_emiss_MFT1 - ref_lens_MFT1
 
         lens_emiss_MFT2 = lens_emiss_MFTarr2[i]
-        lens_eff_MFT2 = 1. - lens_emiss_MFT2 - ref_lens_MFT
+        lens_eff_MFT2 = 1. - lens_emiss_MFT2 - ref_lens_MFT2
        
         
         p_cmb = fp_cmb(freqMFT[i])

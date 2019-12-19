@@ -5,6 +5,9 @@ k_b = 1.3806503e-23
 c = 299792458.
 h = 6.626068e-34
 
+#h = 6.626070040e-34 # by Sophie
+#k_b = 1.38064852e-23 # by Sophie
+
 def FreqRange(freq, band):
     freq_l = freq*(1.-band/2.)
     freq_h = freq*(1.+band/2.)
@@ -16,13 +19,13 @@ def BB( freq, T):
 
 def Trm (d, n, losstan, freq, ref):
     emiss = 1. - np.exp(-2.*pi*d*n*losstan*freq/c)
+   # emiss = 1. - np.exp(-1.*pi*d*n*losstan*freq/c)
     eff = 1. - ref - emiss
     return emiss, eff
 
 def Hwp (hwp_emiss, ref_hwp):
     eff = 1. - ref_hwp - hwp_emiss
     return eff
-
 
 def Aperture( dpix, beamwaistfactor, Fnum, freq_c):
     apt_eff = 1. - np.exp(-1.*pi**2./2.*(dpix/beamwaistfactor/Fnum*freq_c/c)**2.) # aperture efficiency

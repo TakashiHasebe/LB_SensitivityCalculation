@@ -46,19 +46,3 @@ def dPdT(freq, eff, T_cmb):
 def Sigma(NET, t):
     sigma = np.sqrt(4.*pi*2.*NET*NET/t)*10800./pi;
     return sigma
-
-def Emiss (d, n, losstan, freq, ref):
-    emiss = 1. - np.exp(-2.*pi*d*n*losstan*freq/c)
-   # emiss = 1. - np.exp(-1.*pi*d*n*losstan*freq/c)
-   # eff = 1. - ref - emiss
-    return emiss
-
-def Eff (d, n, losstan, freq, ref):
-    emiss = 1. - np.exp(-2.*pi*d*n*losstan*freq/c)
-   # emiss = 1. - np.exp(-1.*pi*d*n*losstan*freq/c)
-    eff = 1. - ref - emiss
-    return eff
-
-def AptEff( dpix, beamwaistfactor, Fnum, freq_c):
-    apt_eff = 1. - np.exp(-1.*pi**2./2.*(dpix/beamwaistfactor/Fnum*freq_c/c)**2.) # aperture efficiency
-    return apt_eff
