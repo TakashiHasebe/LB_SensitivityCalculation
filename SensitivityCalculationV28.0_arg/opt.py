@@ -3,7 +3,7 @@ import numpy as np
 ############################# Optics Temperatures ############################################
 def Temp_Opt():
     T_bath = 0.1 # bolometer operation temp
-    T_baf = 5. # baffle temp
+    T_baf = 5. # telescope shield ( optics tube ) temp
     T_cmb = 2.725 # CMB temp
     T_hwp_LFT = 20. # LFT-HWP temp
     T_hwp_HFT = 20. #HFT-HWP temp
