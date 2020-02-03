@@ -7,8 +7,8 @@ def Temp_Opt():
     T_cmb = 2.725 # CMB temp
     T_hwp_LFT = 20. # LFT-HWP temp
     T_hwp_HFT = 20. #HFT-HWP temp
-    T_apt_LFT = 5. #aperture temp
-    T_apt_HFT = 5. #aperture temp
+    T_apt_LFT = 2. #aperture temp
+    T_apt_HFT = 2. #aperture temp
     T_mir = T_baf #mirror temp
     T_fil = 2. #filter temp
     T_len = T_bath #detector lenslet temp
@@ -17,7 +17,8 @@ def Temp_Opt():
     Tr_mir = T_baf# reflected temp of mirror
     Tr_fil = T_bath # reflected temp of filter
     Tr_len = T_baf # reflected temp of detector lenslet
-    Tr_lens = T_baf # reflected temp of HFT-lens
+   # Tr_lens = T_baf # reflected temp of HFT-lens
+    Tr_lens = 5 # reflected temp of HFT-lens
    
     return  T_bath, T_baf, T_cmb, T_hwp_LFT,T_hwp_HFT,T_apt_LFT, T_apt_HFT, T_mir, T_fil, T_len, T_lens, Tr_hwp,Tr_mir,Tr_fil,Tr_len,Tr_lens
 

@@ -251,7 +251,8 @@ for i in range(0,m2):
         
         NEPopt =np.sqrt(np.sum(nep_opt_arr)*(freq_h-freq_l)*1.e9/num)*1.e18 # in unit of aW
         NEPth = np.sqrt(4.*k_b*Psat*1.e-12*T_bath*(3.+1.)**2./(2.*3.+3.)*(1.71**(2.*3.+3.)-1.)/((1.71**(3.+1.)-1.)**2.))*1.e18
-        NEPread = np.sqrt(0.21*(NEPopt**2.+NEPth**2.))
+        #NEPread = np.sqrt(0.21*(NEPopt**2.+NEPth**2.))
+        NEPread = np.sqrt(Popt/0.5)*3.5
         NEPint = np.sqrt(NEPopt**2. + NEPth**2. + NEPread**2.)
         NEPext = np.sqrt(0.32)*np.sqrt(NEPint**2.)
         NEPdet = np.sqrt(NEPint**2. + NEPext**2.)
