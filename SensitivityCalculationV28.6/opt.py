@@ -2,22 +2,29 @@ import numpy as np
 
 ############################# Optics Temperatures ############################################
 def Temp_Opt():
-    T_baf = 5. # telescope baffle temperature
-    T_bath = 0.1 # detector bath temperature
-    T_bolo = T_bath *1.71 # bolometer temperature
+    T_bath = 0.1 # bolometer operation temp
     T_cmb = 2.725 # CMB temp
     T_hwp_LFT = 20. # LFT-HWP temp
     T_hwp_HFT = 20. #HFT-HWP temp
-    T_apt_LFT = 5. #aperture temp
+    T_apt_LFT = 2. #aperture temp
+    T_apt_MFT = 5. #aperture temp
     T_apt_HFT = 5. #aperture temp
-    T_mir = T_baf #mirror temp
+    T_mir = 5. #mirror temp
     T_fil = 2. #filter temp
     T_FPhood = 2. #FP hood temp
-    Tr_hwp = T_baf # reflected temp of HWP
-    Tr_mir = T_baf # reflected temp of mirror
-    Tr_fil = T_bolo
-    Tr_det = T_bolo
-    return  T_baf, T_bath, T_bolo, T_cmb, T_hwp_LFT,T_hwp_HFT,T_apt_LFT, T_apt_HFT, T_mir, T_fil, T_FPhood, Tr_hwp, Tr_mir, Tr_fil, Tr_det
+    T_horn = T_bath #HF feed horn temp
+    T_lens = 5.# HFT-lens temp
+    T_baf = 5. # baffle temp
+    Tr_hwp = 5.# reflected temp of HWP
+    Tr_mir = 5.# reflected temp of mirror
+    Tr_fil = T_bath # reflected temp of filter
+    #Tr_len = T_bath # reflected temp of detector lenslet
+    Tr_lens = 5. # reflected temp of HFT-lens
+    #Tr_horn = 5. # reflected temp of HFT-lens
+    Tr_horn = T_bath # reflected temp of HFT-lens
+    Tr_det = T_bath*1.71
+    return  T_bath, T_cmb, T_hwp_LFT,T_hwp_HFT,T_apt_LFT, T_apt_MFT,T_apt_HFT, T_mir, T_fil, T_FPhood, T_horn, T_lens, T_baf, Tr_hwp,Tr_mir,Tr_fil,Tr_lens,Tr_horn,Tr_det
+
 
 ################################# Optics parameters ##########################################
 
@@ -27,7 +34,13 @@ def LFT_Hwp(): #LFT HWP with ARC
     ref_hwp_LFT = np.array([[0.091, 0.033, 0.032],[0.043, 0.031, 0.024],[0.031, 0.024, 0.012],[0.032, 0.016, 0.013]]) #reflectance
     emiss_hwp_LFT=np.array([[0.003, 0.005, 0.007],[0.005, 0.006, 0.007],[0.006, 0.007, 0.010],[0.007, 0.009, 0.011]]) #reflectance
     pol_hwp_LFT = np.array([[0.866, 0.997, 0.993],[0.972, 0.996, 0.996],[0.996, 0.996, 0.991],[0.993, 0.997, 0.971]]) #polarization eff
-    return eff_hwp_LFT, ref_hwp_LFT, emiss_hwp_LFT, pol_hwp_LFT
+    pol_dil_LFT = np.array([[1, 1, 1],[1, 1, 1],[1, 1, 1],[1, 1, 1]]) #polarization dilution factor
+    return eff_hwp_LFT, ref_hwp_LFT, emiss_hwp_LFT, pol_hwp_LFT, pol_dil_LFT
+
+def LFT_Apt():# LFT cold aperture stop 
+    bf_LFT = 2.75 #beam waist factor
+    Fnum_LFT = 1.92 #F number
+    return bf_LFT, Fnum_LFT
 
 def LFT_Spill():
     spill_2Khood = np.array([[0.100, 0.066, 0.031],[0.085, 0.050, 0.015],[0.090, 0.062, 0.026],[0.077, 0.048, 0.010]]) #spillover at 2K hood
@@ -39,14 +52,14 @@ def LFT_Spill():
 
 def LFT_Det():# detector coupling efficiency
     det_eff_LFT =  np.array([[0.69, 0.69, 0.69 ],[0.69, 0.69, 0.69],[0.69, 0.69, 0.69],[0.69, 0.69, 0.69]]) 
-    return det_eff_LFT
-
+    return det_eff_LFT 
 ##### MHFT #####
 def HFT_Hwp():
     hwp_emiss_HFT = np.array([[0.035, 0.024, 0.019, 0.015, 0.014],[0.053, 0.033, 0.025, 0.020, 0.023]])  #emissivity
     ref_hwp_HFT   = np.array([[0.010, 0.019, 0.024, 0.012, 0.010],[0.025, 0.021, 0.025, 0.013, 0.009]]) #reflectance
     pol_hwp_HFT   = np.array([[0.987, 0.955, 0.938, 0.956, 0.984],[0.981, 0.966, 0.955, 0.977, 0.984]]) # polarization efficiency
-    return hwp_emiss_HFT, ref_hwp_HFT, pol_hwp_HFT 
+    pol_dil_HFT   = np.array([[1, 1, 1, 1, 1],[1, 1, 1, 1, 1]]) # HWP rotation dilution factor
+    return hwp_emiss_HFT, ref_hwp_HFT, pol_hwp_HFT, pol_dil_HFT 
 
 def HFT_Apt():
     bf_HFT   = np.array([[2.75,2.75,2.75,2.75,2.75],[3.1, 3.1, 3.1,3.1,3.1]]) # beam waist factor
@@ -80,4 +93,10 @@ def Fil():#2K filter
     ref_fil = 0.05 # reflectance
     return t_fil, n_fil, tan_fil, ref_fil
 
+def Len():# detector lenslet
+    t_len = 9.e-3 #thickness
+    n_len = 3.4 #refractive index
+    tan_len = 5.e-5 #loss tangent
+    ref_len = 0.05  #reflectance
+    return t_len, n_len, tan_len, ref_len
   

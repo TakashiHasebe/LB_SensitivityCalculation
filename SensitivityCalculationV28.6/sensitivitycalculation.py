@@ -27,7 +27,8 @@ n2=5
 num=10000
 
 ############################# Optics Temperatures ################################
-T_baf, T_bath, T_bolo, T_cmb, T_hwp_LFT,T_hwp_HFT,T_apt_LFT, T_apt_HFT, T_mir, T_fil, T_FPhood, Tr_hwp,Tr_mir,Tr_fil,Tr_det = opt.Temp_Opt()
+
+T_bath, T_cmb, T_hwp_LFT,T_hwp_HFT,T_apt_LFT, T_apt_MFT, T_apt_HFT, T_mir, T_fil, T_FPhood, T_horn, T_lens, T_baf, Tr_hwp,Tr_mir,Tr_fil,Tr_lens,Tr_horn,Tr_det = opt.Temp_Opt()
 
 ################################ FP parameters ##########################################
 freqLFT, bandLFT, dpixLFT, npixLFT = fp.LFT_FP()
@@ -35,12 +36,13 @@ freqHFT, bandHFT, dpixHFT, npixHFT = fp.HFT_FP()
 
 ################################# Opics parameters ##########################################
 #LFT
-hwp_eff_LFT, ref_hwp_LFT, hwp_emiss_LFT, pol_hwp_LFT = opt.LFT_Hwp()
+hwp_eff_LFT, ref_hwp_LFT, hwp_emiss_LFT, pol_hwp_LFT, df_LFT = opt.LFT_Hwp()
 Spill_fp, Spill_as, Spill_ts, Spill_hm, Apt_eff = opt.LFT_Spill()
+bf_LFT, F_LFT = opt.LFT_Apt()
 det_eff_LFT = opt.LFT_Det() 
 
 #HFT
-hwp_emiss_HFT, ref_hwp_HFT, pol_hwp_HFT = opt.HFT_Hwp() # MM-HWP
+hwp_emiss_HFT, ref_hwp_HFT, pol_hwp_HFT, df_HFT = opt.HFT_Hwp() # MM-HWP
 bf_HFT, Fnum_HFT = opt.HFT_Apt() 
 det_eff_HFT = opt.HFT_Det() 
 ref_horn = 0.05 # reflectance of feedhorn
@@ -53,23 +55,16 @@ epsilon, rho, rms = opt.Mir()
 #2K filter
 t_fil, n_fil, tan_fil, ref_fil =opt.Fil()
 
+# detector lenslet
+t_len, n_len, tan_len, ref_len =opt.Len()
        
-def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac, T_bath=T_bath, T_baf=T_baf, T_fil=T_fil, T_FPhood=T_FPhood, T_apt_LFT=T_apt_LFT, T_apt_HFT=T_apt_HFT, T_hwp_LFT=T_hwp_LFT, T_hwp_HFT=T_hwp_HFT, det_eff_LFT=det_eff_LFT,  det_eff_HFT=det_eff_HFT):
+def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac, T_bath=T_bath, T_baf=T_baf, T_fil=T_fil, T_FPhood=T_FPhood, T_apt_LFT=T_apt_LFT, T_apt_MFT=T_apt_MFT, T_apt_HFT=T_apt_HFT, T_hwp_LFT=T_hwp_LFT, T_hwp_HFT=T_hwp_HFT, det_eff_LFT=det_eff_LFT,  det_eff_HFT=det_eff_HFT):
 
     t=3.*365.*24.*60.*60.*DC*CR*CT;# 3 years ovservation time including cosmic ray loss (CR), contingency (CT) and observation duty cycle (DC)
 
+
     ####################### LFT noise calculation ############################
     p_opt_arr = np.zeros(num)
-    p_cmb_arr = np.zeros(num)
-    p_apt_arr = np.zeros(num)
-    p_hwp_arr = np.zeros(num)
-    p_lens_arr = np.zeros(num)
-    p_len_arr = np.zeros(num)
-    p_fil_arr = np.zeros(num)
-    p_fp_arr = np.zeros(num)
-    p_as_arr = np.zeros(num)
-    p_ts_arr = np.zeros(num)
-    p_hm_arr = np.zeros(num)
     nep_opt_arr = np.zeros(num)
     dpdt_arr = np.zeros(num)
     NETarrLFT=([[0.,0.,0.],[0.,0.,0.],[0.,0.,0.],[0.,0.,0.]])
@@ -89,9 +84,12 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
             
             for k in range(0,num):
                 freq = freq_l+(freq_h - freq_l)*k/(num-1)
+                
                 pm_emiss, pm_eff, pm_loss = f.Mirror(freq*1.e9, rho, epsilon, rms)
                 sm_emiss, sm_eff, sm_loss = f.Mirror(freq*1.e9, rho, epsilon, rms)
                 fil_emiss, fil_eff = f.Trm(t_fil, n_fil, tan_fil, freq*1.e9, ref_fil)
+                ref_len = 0.05
+                len_emiss, len_eff = f.Trm(t_len, n_len, tan_len, freq*1.e9, ref_len)
 
                 p_cmb = f.BB(freq*1.e9,T_cmb)*hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*det_eff_LFT[i][j]
 
@@ -99,6 +97,7 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
                 p_hwp_ref = f.BB(freq*1.e9,Tr_hwp)*ref_hwp_LFT[i][j]*apt_eff*pm_eff*sm_eff*fil_eff*det_eff_LFT[i][j]
                 p_hwp = p_hwp + p_hwp_ref
 
+          
                 p_pm = f.BB(freq*1.e9,T_mir)*pm_emiss*sm_eff*fil_eff*det_eff_LFT[i][j]
                 p_pm_ref = f.BB(freq*1.e9,Tr_mir)*pm_loss*sm_eff*fil_eff*det_eff_LFT[i][j]
                 p_pm = p_pm + p_pm_ref
@@ -121,18 +120,17 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
                 p_det = f.BB(freq*1.e9,Tr_det)*(1-det_eff_LFT[i][j])
          
                 p_opt = p_cmb + p_hwp +  p_pm + p_sm + p_fp + p_as + p_ts + p_hm + p_fil + p_det 
-                p_opt_arr[k] = p_opt
-            
-                eff = hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*det_eff_LFT[i][j]*pol_hwp_LFT[i][j]
+
+                eff = hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*det_eff_LFT[i][j]*pol_hwp_LFT[i][j]*df_LFT[i][j]
                 
+                p_opt_arr[k] = p_opt
                 nep_opt = 2.*p_opt*f.h*freq*1.e9 + 2.*p_opt**2.
                 nep_opt_arr[k] = nep_opt
-                
                 dpdt = f.dPdT(freq*1.e9, eff, T_cmb)
                 dpdt_arr[k] = dpdt
 
             Popt = np.sum(p_opt_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
-           
+
             Psat = Pfac*Popt    
            
             NEPopt =np.sqrt(np.sum(nep_opt_arr)*(freq_h-freq_l)*1.e9/num)*1.e18 # in unit of aW
@@ -148,6 +146,7 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
 
             print round(freqLFT[i][j],2)," , ",round(Popt,8)," , ",round(NEPopt,8)," , ",round(NEPth,8)," , ",round(NEPread,8)," , ",round(NEPint,8)," , ",round(NEPext,8)," , ",round(NEPdet,8)," , ",round(NETdet,8)," , ",round(NETarrLFT[i][j],8)
 
+
     ####################### MHFT noise calculation ############################
 
     NETarrHFT=([[0.,0.,0.,0.,0],[0.,0.,0.,0.,0.]])
@@ -158,8 +157,8 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
             freq_l, freq_h = f.FreqRange(freqHFT[i][j],bandHFT[i][j])
             
             for k in range(0,num):
-                #freq = freq_l+(freq_h - freq_l)*k/(num-1)
-                freq = freq_l+(freq_h - freq_l)*k/(num)
+                freq = freq_l+(freq_h - freq_l)*k/(num-1)
+                #freq = freq_l+(freq_h - freq_l)*k/(num)
                 hwp_eff = 1.- hwp_emiss_HFT[i][j] - ref_hwp_HFT[i][j]
             
                 apt_emiss, apt_eff = f.Aperture(dpixHFT[i][j]*1.e-3, bf_HFT[i][j], Fnum_HFT[i][j], freq*1.e9)
@@ -168,45 +167,63 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
                 sm_emiss = emiss_L2[i][j]
                 pm_eff = 1. - pm_emiss - ref_L1[i][j]
                 sm_eff = 1. - sm_emiss - ref_L2[i][j]
+                 
                   
                 fil_emiss, fil_eff = f.Trm(t_fil, n_fil, tan_fil, freq*1.e9, ref_fil)
-                   
-                p_cmb = f.BB(freq*1.e9,T_cmb)*hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*det_eff_HFT[i][j]
                 
-                p_hwp = f.BB(freq*1.e9,T_hwp_HFT)*hwp_emiss_HFT[i][j]*apt_eff*pm_eff*sm_eff*fil_eff*det_eff_HFT[i][j]
-                p_hwp_ref = f.BB(freq*1.e9,Tr_hwp)*ref_hwp_HFT[i][j]*apt_eff*pm_eff*sm_eff*fil_eff*det_eff_HFT[i][j]
+                if (i==0): # lens coupled detetor
+                    len_emiss = 0.
+                    len_eff = 1.
+                    ref_len = 0.
+
+                if (i==1): # horn coupled detector
+                    len_emiss = 0.
+                    len_eff = 1.-ref_horn
+                    ref_len = ref_horn
+                  
+                p_cmb = f.BB(freq*1.e9,T_cmb)*hwp_eff*apt_eff*pm_eff*sm_eff*len_eff*fil_eff*det_eff_HFT[i][j]
+                
+                p_hwp = f.BB(freq*1.e9,T_hwp_HFT)*hwp_emiss_HFT[i][j]*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
+                p_hwp_ref = f.BB(freq*1.e9,Tr_hwp)*ref_hwp_HFT[i][j]*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
                 p_hwp = p_hwp + p_hwp_ref
+
+                if (i==0): # MFT
+                    p_apt = f.BB(freq*1.e9,T_apt_MFT)*apt_emiss*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
+
+                if (i==1): # HFT
+                    p_apt = f.BB(freq*1.e9,T_apt_HFT)*apt_emiss*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
                 
-                p_apt = f.BB(freq*1.e9,T_apt_HFT)*apt_emiss*pm_eff*sm_eff*fil_eff*det_eff_HFT[i][j]
-                
-                p_pm = f.BB(freq*1.e9,T_mir)*pm_emiss*sm_eff*fil_eff*det_eff_HFT[i][j]
-                p_pm_ref = f.BB(freq*1.e9,Tr_mir)*ref_L1[i][j]*sm_eff*fil_eff*det_eff_HFT[i][j]
+                p_pm = f.BB(freq*1.e9,T_mir)*pm_emiss*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
+                p_pm_ref = f.BB(freq*1.e9,Tr_mir)*ref_L1[i][j]*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]
                 p_pm = p_pm + p_pm_ref
                 
-                p_sm = f.BB(freq*1.e9,T_mir)*sm_emiss*fil_eff*det_eff_HFT[i][j]
-                p_sm_ref = f.BB(freq*1.e9,Tr_mir)*ref_L2[i][j]*fil_eff*det_eff_HFT[i][j]
+                p_sm = f.BB(freq*1.e9,T_mir)*sm_emiss*fil_eff*len_eff*det_eff_HFT[i][j]
+                p_sm_ref = f.BB(freq*1.e9,Tr_mir)*ref_L2[i][j]*fil_eff*len_eff*det_eff_HFT[i][j]
                 p_sm = p_sm + p_sm_ref
                 
-                p_fil = f.BB(freq*1.e9,T_fil)*fil_emiss*det_eff_HFT[i][j]
-                p_fil_ref = f.BB(freq*1.e9,Tr_fil)*ref_fil*det_eff_HFT[i][j]
+                p_fil = f.BB(freq*1.e9,T_fil)*fil_emiss*len_eff*det_eff_HFT[i][j]
+                p_fil_ref = f.BB(freq*1.e9,Tr_fil)*ref_fil*len_eff*det_eff_HFT[i][j]
                 p_fil = p_fil + p_fil_ref
                 
+                p_len = f.BB(freq*1.e9,T_horn)*len_emiss*det_eff_HFT[i][j]
+                p_len_ref = f.BB(freq*1.e9,Tr_horn)*ref_len*det_eff_HFT[i][j]
+                p_len = p_len + p_len_ref
+                
                 p_det = f.BB(freq*1.e9,Tr_det)*(1-det_eff_HFT[i][j])
+         
+                p_opt = p_cmb + p_hwp + p_apt + p_pm + p_sm + p_fil + p_len + p_det 
 
-                p_opt = p_cmb + p_hwp + p_apt + p_pm + p_sm + p_fil + p_det 
+                eff = hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*len_eff*det_eff_HFT[i][j]*pol_hwp_HFT[i][j]*df_HFT[i][j]
+                     
                 p_opt_arr[k] = p_opt
-
-                eff = hwp_eff*apt_eff*pm_eff*sm_eff*fil_eff*det_eff_HFT[i][j]*pol_hwp_HFT[i][j]
-
                 nep_opt = 2.*p_opt*f.h*freq*1.e9 + 2.*p_opt**2.
                 nep_opt_arr[k] = nep_opt
-
                 dpdt = f.dPdT(freq*1.e9, eff, T_cmb)
                 dpdt_arr[k] = dpdt
 
-                if(freqHFT[i][j] == freq):
-                    print "p_hwp=",p_hwp,"p_apt=",p_apt,"p_pm=",p_pm,"p_sm=",p_sm,"p_fil=",p_fil,"p_det=",p_det, "p_opt=",p_opt
-
+                #if(freqHFT[i][j] == freq):
+                   # print "p_hwp=",p_hwp,"p_apt=",p_apt,"p_pm=",p_pm,"p_sm=",p_sm,"p_fil=",p_fil,"p_len=",p_len,"p_det=",p_det, "p_opt=",p_opt
+                     
             Popt = np.sum(p_opt_arr)*(freq_h-freq_l)*1.e9/num*1.e12 # in unit of pW
             
             Psat = Pfac*Popt
@@ -222,7 +239,7 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
             NETarrHFT[i][j] = NETdet/np.sqrt(2.*npixHFT[i][j]*0.8)  
 
 
-            #print round(freqHFT[i][j],2)," , ",round(Popt,8)," , ",round(NEPopt,8)," , ",round(NEPth,8)," , ",round(NEPread,8)," , ",round(NEPint,8)," , ",round(NEPext,8)," , ",round(NEPdet,8)," , ",round(NETdet,8)," , ",round(NETarrHFT[i][j],8)
+            print round(freqHFT[i][j],2)," , ",round(Popt,8)," , ",round(NEPopt,8)," , ",round(NEPth,8)," , ",round(NEPread,8)," , ",round(NEPint,8)," , ",round(NEPext,8)," , ",round(NEPdet,8)," , ",round(NETdet,8)," , ",round(NETarrHFT[i][j],8)
        
 
     NETarr = np.zeros(15)        
@@ -247,15 +264,16 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
     Sensitivity =  f.Sigma( NETarr, t);
     Sum_sens = 0
 
-    print "Freq [GHz] , NETarr [microK/rtHz] , Sensitivity [microK -arcmin]"
+    print "Freq [GHz] , Sensitivity [microK -arcmin]"
 
     for i in range (0,15):
         Sum_sens = Sum_sens + 1./(Sensitivity[i]**2.) 
-        print Freq[i]," , ",round(NETarr[i],2)," , ",round(Sensitivity[i],2)
+        print Freq[i]," , ",round(Sensitivity[i],2)
     Ave_sens = np.sqrt(1./Sum_sens)   
 
     print "Averaged_sensitivity = ",round(Ave_sens,2)
 
-    print "T_HWP= [",T_hwp_LFT,T_hwp_HFT,"] K,", "T_stop= [",T_apt_LFT,T_apt_HFT,"] K, Duty cycle= ",DC," T_bath= ",T_bath, " T_baf= ",T_baf, " T_bolo= ",T_bolo, " T_mir= ",T_mir, " T_fil= ",T_fil, " T_FPhood= ",T_FPhood, " Tr_mir= ",Tr_mir, " Tr_fil= ",Tr_fil, " Tr_det= ",Tr_det
+    print "T_HWP= [",T_hwp_LFT,T_hwp_HFT,"] K,", "T_stop= [",T_apt_LFT,T_apt_MFT, T_apt_HFT,"] K, Duty cycle= ",DC," T_bath= ",T_bath
 
-    return Freq, NETarr, Sensitivity
+    return Freq, Sensitivity
+
