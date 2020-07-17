@@ -7,8 +7,8 @@ def Temp_Opt():
     T_cmb = 2.725 # CMB temp
     T_hwp_LFT = 20. # LFT-HWP temp
     T_hwp_HFT = 20. #HFT-HWP temp
-    T_apt_LFT = 2. #aperture temp
-    T_apt_HFT = 2. #aperture temp
+    T_apt_LFT = 5. #aperture temp
+    T_apt_HFT = 5. #aperture temp
     T_mir = T_baf #mirror temp
     T_fil = 2. #filter temp
     T_len = T_bath #detector lenslet temp
