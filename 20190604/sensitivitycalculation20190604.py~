@@ -133,8 +133,8 @@ for i in range(0,m1):
 
            # if freq==freqLFT[i][j]:
            #     print round(freq,2),", ",round(p_cmb*1.e24, 3),", ",round(p_hwp*1.e24, 3),", ",round(p_apt*1.e24, 3),", ",round(p_pm*1.e24, 3),", ",round(p_sm*1.e24, 3),", ",round(p_fil*1.e24, 3),", ",round(p_len*1.e24, 3),", ",round(p_opt*1.e24, 3),", ",round(p_20K*1.e24, 3)
-           # if freq==freqLFT[0][0]:
-                # print( round(freq,2),", ",p_hwp,", ",p_apt,", ",p_20K,", ",p_pm,", ",p_sm,", ",p_fil,", ",p_len,",",p_opt)
+            if freq==freqLFT[0][0]:
+                 print( round(freq,2),", ",p_hwp,", ",p_apt,", ",p_20K,", ",p_pm,", ",p_sm,", ",p_fil,", ",p_len,",",p_opt)
                 #print round(freq,2),", ",p_hwp
                 
             
@@ -173,7 +173,7 @@ for i in range(0,m1):
         NETarrLFT[i][j] = NETdet/np.sqrt(2.*npixLFT[i][j])  
         NETarrLFTmargin[i][j] = NETdet*1.15/np.sqrt(2.*npixLFT[i][j]*0.8)  
 
-        print (round(freqLFT[i][j],2)," , ",round(Popt,2)," , ",round(Psat,2)," , ",round(NEPopt,2)," , ",round(NEPth,2)," , ",round(NEPread,2)," , ",round(NEPint,2)," , ",round(NETdet,2)," , ",round(NETarrLFT[i][j],2)," , ",round(NETarrLFTmargin[i][j],2))
+        #print round(freqLFT[i][j],2)," , ",round(Popt,2)," , ",round(Psat,2)," , ",round(NEPopt,2)," , ",round(NEPth,2)," , ",round(NEPread,2)," , ",round(NEPint,2)," , ",round(NETdet,2)," , ",round(NETarrLFT[i][j],2)," , ",round(NETarrLFTmargin[i][j],2)
        # print round(freqLFT[i][j],2)," , ",round(Pcmb,3)," , ",round(Phwp,3)," , ",round(Papt,3)," , ",round(Plens,3)," , ",Pfil," , ",round(Plen,3)," , ",round(P20K,3)," , ",round(Popt,3)
        # print round(freqLFT[i][j],2)," , ",round(Pcmb,5)
 
