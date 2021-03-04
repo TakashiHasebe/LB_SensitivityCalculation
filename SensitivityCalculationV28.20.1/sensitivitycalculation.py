@@ -145,7 +145,7 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
             NETdet = NEPdet*1.e-18/np.sqrt(2.)/DPDT*1.e6 # in unit of microK
             NETarrLFT[i][j] = NETdet/np.sqrt(2.*npixLFT[i][j]*0.8)
             
-            print round(freqLFT[i][j],2) , round(Popt,8) , round(NEPopt,8) , round(NEPth,8) , round(NEPread,8) ,round(NEPint,8) , round(NEPext,8) , round(NEPdet,8) , round(NETdet,8) , round(NETarrLFT[i][j],8)
+            print (round(freqLFT[i][j],2) , round(Popt,8) , round(NEPopt,8) , round(NEPth,8) , round(NEPread,8) ,round(NEPint,8) , round(NEPext,8) , round(NEPdet,8) , round(NETdet,8) , round(NETarrLFT[i][j],8))
 
 ####################### MFT noise calculation ############################
 
@@ -224,8 +224,7 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
         NETdet = NEPdet*1.e-18/np.sqrt(2.)/DPDT*1.e6 # in unit of microK
         NETarrMFT[j] = NETdet/np.sqrt(2.*npix_MFT[j]*0.8)  
 
-        #print (round(freq_MFT[j],2)," , ",round(NETarrMFT[j],2))
-        print round(freq_MFT[j],2) , round(Popt,8) , round(NEPopt,8) , round(NEPth,8) , round(NEPread,8) , round(NEPint,8) , round(NEPext,8) , round(NEPdet,8) , round(NETdet,8) , round(NETarrMFT[j],8)
+        print (round(freq_MFT[j],2) , round(Popt,8) , round(NEPopt,8) , round(NEPth,8) , round(NEPread,8) , round(NEPint,8) , round(NEPext,8) , round(NEPdet,8) , round(NETdet,8) , round(NETarrMFT[j],8))
 
 ####################### HFT noise calculation ############################
 
@@ -312,7 +311,7 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
         NETdet = NEPdet*1.e-18/np.sqrt(2.)/DPDT*1.e6 # in unit of microK
         NETarrHFT[j] = NETdet/np.sqrt(2.*npix_HFT[j]*0.8)  
 
-        print round(freq_HFT[j],2) , round(Popt,8) , round(NEPopt,8) , round(NEPth,8) , round(NEPread,8) , round(NEPint,8) , round(NEPext,8) , round(NEPdet,8) , round(NETdet,8) , round(NETarrHFT[j],8)
+        print (round(freq_HFT[j],2) , round(Popt,8) , round(NEPopt,8) , round(NEPth,8) , round(NEPread,8) , round(NEPint,8) , round(NEPext,8) , round(NEPdet,8) , round(NETdet,8) , round(NETarrHFT[j],8))
 
 
     NETarr = np.zeros(15)        
@@ -341,7 +340,7 @@ def LFT_MHFT_sensitivity_calculator(Freq=Freq, DC=DC, CR =CR, CT=CT, Pfac= Pfac,
 
     for i in range (0,15):
         Sum_sens = Sum_sens + 1./(Sensitivity[i]**2.) 
-        print Freq[i]," , ",round(NETarr[i],2)," , ",round(Sensitivity[i],2)
+        print (Freq[i]," , ",round(NETarr[i],2)," , ",round(Sensitivity[i],2))
     Ave_sens = np.sqrt(1./Sum_sens)   
 
     print ("Averaged_sensitivity = ",round(Ave_sens,2))
